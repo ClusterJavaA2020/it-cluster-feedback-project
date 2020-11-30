@@ -1,5 +1,6 @@
 package com.feedback.repo.entity;
 
+import com.feedback.model.Answer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,6 @@ public class Feedback {
     private String id;
     private Long userId;
     private Long feedbackRequestId;
-    // 'String' is a temporary type, should be created some specific Class for Answers
-    private Set<String> feedbackAnswer;
+    private boolean isClosed;
+    private Set<Answer> answer;
 }

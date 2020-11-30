@@ -1,15 +1,14 @@
 package com.feedback.repo.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@ToString(exclude = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -23,8 +22,8 @@ public class Course {
     @Column(nullable = false)
     private String title;
     private String description;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean isActive = false;
 
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
