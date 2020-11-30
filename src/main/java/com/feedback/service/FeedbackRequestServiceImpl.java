@@ -4,7 +4,11 @@ import com.feedback.dto.FeedbackRequestDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
-import com.feedback.repo.entity.*;
+import com.feedback.repo.entity.Course;
+import com.feedback.repo.entity.Feedback;
+import com.feedback.repo.entity.FeedbackRequest;
+import com.feedback.repo.entity.Role;
+import com.feedback.repo.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,6 +19,7 @@ import static com.feedback.dto.FeedbackRequestDto.map;
 
 @Service
 public class FeedbackRequestServiceImpl implements FeedbackRequestService {
+    public static final int END_DATE = 5;
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final CourseRepo courseRepo;
     private final FeedbackRepo feedbackRepo;
@@ -35,7 +40,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             FeedbackRequest feedbackRequest = feedbackRequestRepo.save(FeedbackRequest.builder()
                     .course(course.get())
                     .startDate(LocalDate.now())
-                    .endDate(LocalDate.now().plusDays(5))
+                    .endDate(LocalDate.now().plusDays(END_DATE))
                     .build());
 
             users.forEach(user -> {
