@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Answer<T> {
-    private String question;
-    private int teacherId;
+    private Long questionId;
+    private Long aboutUserId;
     private T answer;
     private String comment;
 }
