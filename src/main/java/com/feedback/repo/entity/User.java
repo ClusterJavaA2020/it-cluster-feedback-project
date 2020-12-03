@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -43,11 +44,11 @@ public class User {
     @JoinTable(name = "user_course",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private Set<Course> courses;
+    private Set<Course> courses = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_feedback_request",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "feedback_request_id"))
-    private Set<FeedbackRequest> feedbackRequests;
+    private Set<FeedbackRequest> feedbackRequests = new HashSet<>();
 }
