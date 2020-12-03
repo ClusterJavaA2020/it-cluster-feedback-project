@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -22,5 +23,5 @@ public class Feedback {
     private Long userId;
     private Long feedbackRequestId;
     private boolean isClosed;
-    private Set<Answer> answer;
+    private Set<Answer> answer = new HashSet<>();
 }

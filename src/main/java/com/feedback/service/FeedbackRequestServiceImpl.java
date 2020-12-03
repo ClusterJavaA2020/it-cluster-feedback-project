@@ -12,6 +12,7 @@ import com.feedback.repo.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,27 +36,29 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     public FeedbackRequestDto createFeedbackRequest(Long courseId) {
         Optional<Course> course = courseRepo.findById(courseId);
         if (course.isPresent()) {
-            Set<User> users = course.get().getUsers();
-
-            FeedbackRequest feedbackRequest = feedbackRequestRepo.save(FeedbackRequest.builder()
+            // SQL
+            Set<User> courseUsers = new HashSet<>(course.get().getUsers());
+            FeedbackRequest feedbackRequest = FeedbackRequest.builder()
                     .course(course.get())
+                    .users(courseUsers)
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now().plusDays(END_DATE))
-                    .build());
-
-            users.forEach(user -> {
-                        if (user.getRole().equals(Role.USER)) {
+                    .build();
+            courseUsers.forEach(courseUser -> courseUser.getFeedbackRequests().add(feedbackRequest));
+            FeedbackRequest feedbackRequestResult = feedbackRequestRepo.save(feedbackRequest);
+            // Mongo
+            courseUsers.forEach(courseUser -> {
+                        if (courseUser.getRole().equals(Role.USER)) {
                             feedbackRepo.save(Feedback.builder()
-                                    .feedbackRequestId(feedbackRequest.getId())
-                                    .userId(user.getId())
+                                    .feedbackRequestId(feedbackRequestResult.getId())
+                                    .userId(courseUser.getId())
                                     .isClosed(false)
                                     .build()
                             );
                         }
                     }
             );
-
-            return map(feedbackRequest);
+            return map(feedbackRequestResult);
         } else {
             return null;
         }

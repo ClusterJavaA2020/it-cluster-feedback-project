@@ -18,11 +18,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@ToString(exclude = "users")
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -41,8 +42,8 @@ public class Course {
     private boolean isActive = false;
 
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<FeedbackRequest> feedbackRequests;
+    private Set<FeedbackRequest> feedbackRequests = new HashSet<>();
 }
