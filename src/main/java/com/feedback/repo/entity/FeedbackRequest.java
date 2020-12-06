@@ -2,6 +2,7 @@ package com.feedback.repo.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -37,9 +39,11 @@ public class FeedbackRequest {
     private LocalDate endDate;
     private boolean isActive = false;
 
+    @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "feedbackRequests", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
