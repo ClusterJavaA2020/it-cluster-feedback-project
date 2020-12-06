@@ -17,6 +17,9 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<sonar.projectKey>ClusterJavaA2020_it-cluster-feedback-project</sonar.projectKey>
+		<sonar.organization>clusterjavaa2020</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
@@ -70,5 +73,20 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<sonar.host.url>https://sonarcloud.io/</sonar.host.url>
+				<sonar.organization>clusterjavaa2020</sonar.organization>
+				<!--suppress UnresolvedMavenProperty -->
+				<sonar.login>${env.SONAR_TOKEN}</sonar.login>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>
