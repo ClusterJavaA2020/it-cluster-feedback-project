@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class Answer<T> {
     private Long questionId;
     private Long aboutUserId;
-    private T answer;
+    private T answerValue;
     private String comment;
 }
