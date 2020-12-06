@@ -25,5 +25,5 @@ public class Question {
     private Long id;
     private boolean isPattern = false;
     @Column(nullable = false, unique = true)
-    private String question;
+    private String questionValue;
 }
