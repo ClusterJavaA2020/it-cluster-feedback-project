@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
-@CrossOrigin
 public class FeedbackRequestController {
     private FeedbackRequestService feedbackRequestService;
 

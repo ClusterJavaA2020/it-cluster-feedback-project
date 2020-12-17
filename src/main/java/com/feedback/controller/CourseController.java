@@ -15,7 +15,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/courses")
-@CrossOrigin
+//@CrossOrigin
 public class CourseController {
     @Autowired
     private CourseService courseService;
