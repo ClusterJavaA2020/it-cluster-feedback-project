@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Answer<T> {
+public class Answer {
     private Long questionId;
     private Long aboutUserId;
-    private T answerValue;
+    private int rate;
     private String comment;
 }
