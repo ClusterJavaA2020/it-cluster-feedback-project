@@ -15,7 +15,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/courses")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 public class CourseController {
     @Autowired
     private CourseService courseService;

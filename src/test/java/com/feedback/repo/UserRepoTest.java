@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class UserRepoTest {
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
 
     @Test
     void testSave() {

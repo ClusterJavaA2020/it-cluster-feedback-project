@@ -35,16 +35,16 @@ import static org.mockito.MockitoAnnotations.openMocks;
 class FeedbackRequestServiceTest {
 
     @Mock
-    FeedbackRequestRepo feedbackRequestRepo;
+    private FeedbackRequestRepo feedbackRequestRepo;
     @Mock
-    CourseRepo courseRepo;
+    private CourseRepo courseRepo;
     @Mock
     FeedbackRepo feedbackRepo;
     @Mock
-    QuestionRepo questionRepo;
+    private QuestionRepo questionRepo;
 
     @InjectMocks
-    FeedbackRequestServiceImpl feedbackRequestServiceImpl;
+    private FeedbackRequestServiceImpl feedbackRequestServiceImpl;
 
     @BeforeEach
     public void setUp() {
