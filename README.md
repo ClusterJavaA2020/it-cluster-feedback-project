@@ -1,4 +1,4 @@
-# it-cluster-feedback-project
+# IT Cluster FEEDBACK Project
 The project developed based on Java Advanced courses of IT Cluster Academy
 
 ![Build](https://github.com/ClusterJavaA2020/it-cluster-feedback-project/workflows/Build/badge.svg)
