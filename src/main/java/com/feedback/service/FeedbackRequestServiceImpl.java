@@ -42,10 +42,9 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         Optional<Course> course = courseRepo.findById(courseId);
         if (course.isPresent()) {
             // SQL
-            Set<User> courseUsers = new HashSet<>(course.get().getUsers());
+            Set<User> courseUsers = course.get().getUsers();
             FeedbackRequest feedbackRequest = FeedbackRequest.builder()
                     .course(course.get())
-                    .users(courseUsers)
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now().plusDays(END_DATE))
                     .build();

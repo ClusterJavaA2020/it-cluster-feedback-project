@@ -26,4 +26,6 @@ public class Question {
     private boolean isPattern = false;
     @Column(nullable = false, unique = true)
     private String questionValue;
+    @Column(nullable = false)
+    private boolean isRateable;
 }
