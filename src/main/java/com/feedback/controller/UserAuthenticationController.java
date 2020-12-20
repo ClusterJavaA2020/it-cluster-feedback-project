@@ -7,20 +7,25 @@ import com.feedback.repo.entity.User;
 import com.feedback.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class UserAuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -52,6 +57,11 @@ public class UserAuthenticationController {
     public ResponseEntity<?> register(@RequestBody UserDto userDto) {
         userService.register(userDto);
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/confirm")
+    public void confirmEmail(@RequestParam("email") String email){
+        userService.confirmEmail(email);
     }
 }
 

@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface UserService {
     UserDto register(UserDto userDto);
     Optional<User> findByEmail(String email);
-   // UserDto update(UserDto userDto);
+    void confirmEmail(String email);
 }

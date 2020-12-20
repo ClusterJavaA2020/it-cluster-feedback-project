@@ -40,17 +40,17 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return isActive;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return isActive;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return isActive;
+        return true;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SecurityUser implements UserDetails {
     public static UserDetails fromUser(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(),
-                true, true, true, true,
+                user.isActive(), true, true, true,
                 user.getRole().getAuthorities()
         );
     }
