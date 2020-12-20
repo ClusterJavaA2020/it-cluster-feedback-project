@@ -45,6 +45,7 @@ public class User {
     private String phoneNumber;
    // @Column(nullable = false)
     private Role role=Role.USER;
+    private boolean active = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_course",

@@ -2,8 +2,8 @@ package com.feedback.service;
 
 import com.feedback.dto.UserDto;
 import com.feedback.exceptions.UserAlreadyExistException;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.repo.UserRepo;
-import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,15 +62,20 @@ public class UserServiceImpl implements UserService{
         return map(userRepo.save(map(userDto)));
     }*/
 
+    public void confirmEmail(String email){
+       Optional<User> user = userRepo.findUserByEmail(email);
+       User existedUser = user.orElseThrow(UserNotFoundException::new);
+       existedUser.setActive(true);
+       userRepo.save(existedUser);
+    }
+
     private void sendRegistrationEmail(String userMail){
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(userMail);
-        simpleMailMessage.setSubject("You are registered!");
+        simpleMailMessage.setSubject("You are almost registered!");
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
-        simpleMailMessage.setText("Welcome to FeedBack Application");
+        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/confirm?email="+userMail);
         emailSenderService.sendEmail(simpleMailMessage);
 
     }
-
-
 }
