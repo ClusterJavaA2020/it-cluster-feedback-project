@@ -3,7 +3,10 @@ package com.feedback.repo.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +25,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
+@EqualsAndHashCode(of ={"email"})
 
 @Entity
 @Table(name = "users")
@@ -37,8 +43,8 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-    @Column(nullable = false)
-    private Role role;
+   // @Column(nullable = false)
+    private Role role=Role.USER;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_course",
