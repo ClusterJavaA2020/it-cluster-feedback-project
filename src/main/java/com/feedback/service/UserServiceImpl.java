@@ -13,8 +13,6 @@ import javax.transaction.Transactional;
 
 import java.util.Optional;
 
-
-
 @Service
 @Transactional
 public class UserServiceImpl implements UserService{
@@ -27,17 +25,6 @@ public class UserServiceImpl implements UserService{
         this.emailSenderService = emailSenderService;
         this.passwordEncoder = passwordEncoder;
     }
-
-  /*  public void register(UserDto registrationDto) {
-        User user = User.builder()
-                .firstName(registrationDto.getFirstName())
-                .lastName(registrationDto.getLastName())
-                .email(registrationDto.getEmail())
-                .password(passwordEncoder.encode(registrationDto.getPassword()))
-                .role(Role.USER)
-                .build();
-        userRepo.save(user);
-    }*/
 
     @Override
     public UserDto register(UserDto userDto){
@@ -53,14 +40,6 @@ public class UserServiceImpl implements UserService{
     public Optional<User> findByEmail(String email) {
         return userRepo.findUserByEmail(email);
     }
-
-   /* @Override
-    public UserDto update(UserDto userDto) {
-        if(userRepo.findUserByEmail(userDto.getEmail()).isEmpty()){
-            throw new UserNotFoundException();
-        }
-        return map(userRepo.save(map(userDto)));
-    }*/
 
     public void confirmEmail(String email){
        Optional<User> user = userRepo.findUserByEmail(email);

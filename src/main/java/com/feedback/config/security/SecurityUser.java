@@ -1,4 +1,5 @@
 package com.feedback.config.security;
+
 import com.feedback.repo.entity.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
