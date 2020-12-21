@@ -62,7 +62,7 @@ class FeedbackRequestRepoTest {
         return User.builder()
                 .firstName("FirstName")
                 .lastName("LastName")
-                .email("email@mail.com")
+                .email("email2@mail.com")
                 .role(Role.ADMINISTRATOR)
                 .build();
     }
