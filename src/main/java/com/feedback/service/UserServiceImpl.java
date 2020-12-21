@@ -42,10 +42,9 @@ public class UserServiceImpl implements UserService{
     }
 
     public void confirmEmail(String email){
-       Optional<User> user = userRepo.findUserByEmail(email);
-       User existedUser = user.orElseThrow(UserNotFoundException::new);
-       existedUser.setActive(true);
-       userRepo.save(existedUser);
+       User user = userRepo.findUserByEmail(email).orElseThrow(UserNotFoundException::new);
+       user.setActive(true);
+       userRepo.save(user);
     }
 
     private void sendRegistrationEmail(String userMail){
@@ -55,6 +54,5 @@ public class UserServiceImpl implements UserService{
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
         simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/confirm?email="+userMail);
         emailSenderService.sendEmail(simpleMailMessage);
-
     }
 }
