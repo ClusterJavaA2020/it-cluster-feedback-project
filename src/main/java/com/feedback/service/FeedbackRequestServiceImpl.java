@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -52,7 +53,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             FeedbackRequest feedbackRequestResult = feedbackRequestRepo.save(feedbackRequest);
             // MONGO
             Set<Answer> answers = new HashSet<>();
-            Set<Question> questions = questionRepo.findByIsPatternTrue();
+            List<Question> questions = questionRepo.findByIsPatternTrue();
             questions.forEach(q -> answers.add(Answer.builder().questionId(q.getId()).build()));
             courseUsers.forEach(courseUser -> {
                         if (courseUser.getRole().equals(Role.USER)) {
@@ -70,5 +71,10 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<FeedbackRequestDto> getFeedbackRequestList(Long courseId) {
+        return feedbackRequestRepo.findByCourseId(courseId);
     }
 }

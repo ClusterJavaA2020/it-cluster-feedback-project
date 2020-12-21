@@ -1,10 +1,13 @@
 package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
+import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.feedback.repo.entity.Course;
+import com.feedback.repo.entity.Role;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,8 +15,11 @@ import static com.feedback.dto.CourseDto.map;
 
 @Service
 public class CourseServiceImpl implements CourseService {
-    @Autowired
-    private CourseRepo courseRepo;
+    private final CourseRepo courseRepo;
+
+    public CourseServiceImpl(CourseRepo courseRepo) {
+        this.courseRepo = courseRepo;
+    }
 
     @Override
     public CourseDto create(CourseDto dto) {
@@ -28,7 +34,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Set<CourseDto> getAll() {
         return courseRepo.findAll().stream()
-                .map(CourseDto:: map)
+                .map(CourseDto::map)
                 .collect(Collectors.toSet());
     }
 
@@ -40,5 +46,27 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDto delete(CourseDto dto) {
         return null;
+    }
+
+    @Override
+    public Set<UserDto> getCourseTeachers(Long courseId) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        return course.map(value -> value
+                .getUsers()
+                .stream()
+                .filter(u -> u.getRole().equals(Role.TEACHER))
+                .map(UserDto::map)
+                .collect(Collectors.toSet())).orElse(null);
+    }
+
+    @Override
+    public Set<UserDto> getCourseStudents(Long courseId) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        return course.map(value -> value
+                .getUsers()
+                .stream()
+                .filter(u -> u.getRole().equals(Role.USER))
+                .map(UserDto::map)
+                .collect(Collectors.toSet())).orElse(null);
     }
 }
