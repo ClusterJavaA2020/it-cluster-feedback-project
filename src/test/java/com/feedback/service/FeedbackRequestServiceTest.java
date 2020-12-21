@@ -20,6 +20,7 @@ import org.mockito.Mock;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
@@ -62,7 +63,7 @@ class FeedbackRequestServiceTest {
     void testCreateFeedbackRequest() {
         when(courseRepo.findById(1L)).thenReturn(ofNullable(course()));
         when(feedbackRequestRepo.save(feedbackRequest())).thenReturn(feedbackRequestDB());
-        when(questionRepo.findByIsPatternTrue()).thenReturn(setOfQuestions());
+        when(questionRepo.findByIsPatternTrue()).thenReturn(listOfQuestions());
         setOfUsers().forEach(user -> when(feedbackRepo.save(feedback(user))).thenReturn(feedbackDB(user)));
         // NOT_NULL
         FeedbackRequestDto requestDto = feedbackRequestServiceImpl.createFeedbackRequest(1L);
@@ -130,8 +131,8 @@ class FeedbackRequestServiceTest {
         return feedbackRequest;
     }
 
-    private Set<Question> setOfQuestions() {
-        return Set.of(
+    private List<Question> listOfQuestions() {
+        return List.of(
                 Question.builder()
                         .id(1L)
                         .isPattern(true)
@@ -147,7 +148,7 @@ class FeedbackRequestServiceTest {
 
     Set<Answer> setOfAnswers() {
         Set<Answer> setOfAnswers = new HashSet<>();
-        setOfQuestions().forEach(
+        listOfQuestions().forEach(
                 q -> setOfAnswers.add(Answer.builder()
                         .questionId(q.getId())
                         .build()));

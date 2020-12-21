@@ -4,17 +4,13 @@ import com.feedback.repo.entity.Course;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.Id;
 import java.time.LocalDate;
 
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class CourseDto {
-    @Id
     private Long id;
     private String title;
     private String description;
@@ -22,7 +18,7 @@ public class CourseDto {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public static CourseDto map (Course course) {
+    public static CourseDto map(Course course) {
         return CourseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
