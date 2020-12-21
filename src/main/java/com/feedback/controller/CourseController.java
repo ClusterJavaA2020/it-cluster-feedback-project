@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/course")
+@RequestMapping("/courses")
 public class CourseController {
     private final CourseService courseService;
 
@@ -22,7 +22,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    @GetMapping("/list")
+    @GetMapping("/all")
     public Set<CourseDto> getCourses() {
         return courseService.getAll();
     }
@@ -37,7 +37,7 @@ public class CourseController {
         return courseService.update(dto);
     }
 
-    @GetMapping("")
+    @GetMapping
     public CourseDto getCourseById(@RequestParam Long courseId) {
         return courseService.get(courseId);
     }

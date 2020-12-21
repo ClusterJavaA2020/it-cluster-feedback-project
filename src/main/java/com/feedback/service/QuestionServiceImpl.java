@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
-    QuestionRepo questionRepo;
+    private final QuestionRepo questionRepo;
 
     public QuestionServiceImpl(QuestionRepo questionRepo) {
         this.questionRepo = questionRepo;

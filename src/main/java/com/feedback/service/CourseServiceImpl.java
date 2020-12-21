@@ -3,11 +3,9 @@ package com.feedback.service;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
-import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Role;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,8 +48,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Set<UserDto> getCourseTeachers(Long courseId) {
-        Optional<Course> course = courseRepo.findById(courseId);
-        return course.map(value -> value
+        return courseRepo.findById(courseId).map(value -> value
                 .getUsers()
                 .stream()
                 .filter(u -> u.getRole().equals(Role.TEACHER))
@@ -61,8 +58,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Set<UserDto> getCourseStudents(Long courseId) {
-        Optional<Course> course = courseRepo.findById(courseId);
-        return course.map(value -> value
+        return courseRepo.findById(courseId).map(value -> value
                 .getUsers()
                 .stream()
                 .filter(u -> u.getRole().equals(Role.USER))

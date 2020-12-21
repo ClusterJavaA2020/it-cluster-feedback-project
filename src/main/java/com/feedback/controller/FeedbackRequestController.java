@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/feedback-request")
+@RequestMapping("/feedback-requests")
 public class FeedbackRequestController {
     private final FeedbackRequestService feedbackRequestService;
 
@@ -24,7 +24,7 @@ public class FeedbackRequestController {
         return feedbackRequestService.createFeedbackRequest(courseId);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/all")
     public List<FeedbackRequestDto> getFeedbackRequestList(@RequestParam Long courseId) {
         return feedbackRequestService.getFeedbackRequestList(courseId);
     }

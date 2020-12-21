@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/questions")
 public class QuestionController {
-    QuestionService questionService;
+    private final QuestionService questionService;
 
     public QuestionController(QuestionService questionService) {
         this.questionService = questionService;
@@ -23,12 +23,12 @@ public class QuestionController {
     }
 
     @GetMapping("/patterns")
-    public List<Question> getPatterns(){
+    public List<Question> getPatterns() {
         return questionService.getPatterns();
     }
 
     @GetMapping("/non-patterns")
-    public List<Question> getNonPatterns(){
+    public List<Question> getNonPatterns() {
         return questionService.getNonPatterns();
     }
 }
