@@ -45,7 +45,7 @@ class FeedbackRequestControllerTest {
     void testCreateFeedbackRequest() throws Exception {
         when(feedbackRequestService.createFeedbackRequest(1L)).thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(post("/feedback-request/create")
+                .perform(post("/feedback-requests/create")
                         .param("courseId", "1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
@@ -58,7 +58,7 @@ class FeedbackRequestControllerTest {
     void testGetFeedbackRequestList() throws Exception {
         when(feedbackRequestService.getFeedbackRequestList(1L)).thenReturn(List.of(feedbackRequestDto()));
         MvcResult mvcResult = mockMvc
-                .perform(get("/feedback-request/list")
+                .perform(get("/feedback-requests/all")
                         .param("courseId", "1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
