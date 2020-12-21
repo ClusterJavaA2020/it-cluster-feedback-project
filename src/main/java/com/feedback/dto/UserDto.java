@@ -27,7 +27,6 @@ public class UserDto {
     private String password;
     @Pattern(regexp = "^\\+38\\(0[0-9]{2}\\)[0-9]{3}\\-[0-9]{4}$", message = "Phone Number should have format +38(0XX)XXX-XXXX")
     private String phoneNumber;
-    //@NotBlank(message = "Role shouldn't be empty")
     private String role = String.valueOf(Role.USER);
 
     public static User map(UserDto userDto,String password){
@@ -47,7 +46,6 @@ public class UserDto {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-               // .password(user.getPassword())
                 .phoneNumber(user.getPhoneNumber())
                 .role(String.valueOf(user.getRole()))
                 .build();

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 public class UserAuthenticationController {

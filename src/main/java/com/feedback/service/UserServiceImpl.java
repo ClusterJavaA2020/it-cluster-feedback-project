@@ -42,10 +42,9 @@ public class UserServiceImpl implements UserService{
     }
 
     public void confirmEmail(String email){
-       Optional<User> user = userRepo.findUserByEmail(email);
-       User existedUser = user.orElseThrow(UserNotFoundException::new);
-       existedUser.setActive(true);
-       userRepo.save(existedUser);
+       User user = userRepo.findUserByEmail(email).orElseThrow(UserNotFoundException::new);
+       user.setActive(true);
+       userRepo.save(user);
     }
 
     private void sendRegistrationEmail(String userMail){
