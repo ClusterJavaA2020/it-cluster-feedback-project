@@ -1,7 +1,7 @@
 package com.feedback.config.security;
 
 import com.feedback.repo.entity.User;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode
 public class SecurityUser implements UserDetails {
 
     private final String username;
