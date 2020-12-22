@@ -28,4 +28,9 @@ public class FeedbackRequestController {
     public List<FeedbackRequestDto> getFeedbackRequestList(@RequestParam Long courseId) {
         return feedbackRequestService.getFeedbackRequestList(courseId);
     }
+
+    @GetMapping
+    public FeedbackRequestDto getFeedbackRequestById(@RequestParam Long feedbackRequestId){
+        return feedbackRequestService.getFeedbackRequestById(feedbackRequestId);
+    }
 }
