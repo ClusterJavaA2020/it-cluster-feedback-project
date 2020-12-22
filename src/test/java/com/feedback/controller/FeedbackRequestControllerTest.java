@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -40,16 +42,28 @@ class FeedbackRequestControllerTest {
     }
 
     @Test
-    void createFeedbackRequest() throws Exception {
+    void testCreateFeedbackRequest() throws Exception {
         when(feedbackRequestService.createFeedbackRequest(1L)).thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(post("/feedback-request")
+                .perform(post("/feedback-requests/create")
                         .param("courseId", "1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
         assertEquals(feedbackRequestDto(), map(feedbackRequest()));
+    }
+
+    @Test
+    void testGetFeedbackRequestList() throws Exception {
+        when(feedbackRequestService.getFeedbackRequestList(1L)).thenReturn(List.of(feedbackRequestDto()));
+        MvcResult mvcResult = mockMvc
+                .perform(get("/feedback-requests/all")
+                        .param("courseId", "1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
     }
 
     private Course course() {
