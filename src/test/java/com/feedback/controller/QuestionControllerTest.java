@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -33,6 +34,7 @@ class QuestionControllerTest {
         openMocks(this);
     }
 
+    @WithMockUser
     @Test
     void testGetAllQuestions() throws Exception {
         when(questionService.getAllQuestions()).thenReturn(listOfQuestions());
@@ -44,6 +46,7 @@ class QuestionControllerTest {
                 .andReturn();
     }
 
+    @WithMockUser
     @Test
     void testGetPatterns() throws Exception {
         when(questionService.getPatterns()).thenReturn(listOfQuestions());
@@ -56,6 +59,7 @@ class QuestionControllerTest {
 
     }
 
+    @WithMockUser
     @Test
     void testGetNonPatterns() throws Exception {
         when(questionService.getNonPatterns()).thenReturn(listOfQuestions());
