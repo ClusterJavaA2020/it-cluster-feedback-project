@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -41,6 +42,7 @@ class FeedbackRequestControllerTest {
         openMocks(this);
     }
 
+    @WithMockUser
     @Test
     void testCreateFeedbackRequest() throws Exception {
         when(feedbackRequestService.createFeedbackRequest(1L)).thenReturn(feedbackRequestDto());
@@ -54,6 +56,7 @@ class FeedbackRequestControllerTest {
         assertEquals(feedbackRequestDto(), map(feedbackRequest()));
     }
 
+    @WithMockUser
     @Test
     void testGetFeedbackRequestList() throws Exception {
         when(feedbackRequestService.getFeedbackRequestList(1L)).thenReturn(List.of(feedbackRequestDto()));
