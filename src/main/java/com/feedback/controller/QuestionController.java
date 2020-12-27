@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/questions")
+@RequestMapping("/api/questions")
 public class QuestionController {
     private final QuestionService questionService;
 
@@ -17,7 +17,7 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<Question> getAllQuestions() {
         return questionService.getAllQuestions();
     }

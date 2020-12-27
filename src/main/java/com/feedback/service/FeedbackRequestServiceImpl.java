@@ -1,15 +1,12 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.model.Answer;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
-import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackRequest;
-import com.feedback.repo.entity.Question;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
 import org.springframework.stereotype.Service;
@@ -28,14 +25,12 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final CourseRepo courseRepo;
     private final FeedbackRepo feedbackRepo;
-    private final QuestionRepo questionRepo;
 
     public FeedbackRequestServiceImpl(FeedbackRequestRepo feedbackRequestRepo, CourseRepo courseRepo,
-                                      FeedbackRepo feedbackRepo, QuestionRepo questionRepo) {
+                                      FeedbackRepo feedbackRepo) {
         this.feedbackRequestRepo = feedbackRequestRepo;
         this.courseRepo = courseRepo;
         this.feedbackRepo = feedbackRepo;
-        this.questionRepo = questionRepo;
     }
 
     @Override
@@ -52,16 +47,13 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             courseUsers.forEach(courseUser -> courseUser.getFeedbackRequests().add(feedbackRequest));
             FeedbackRequest feedbackRequestResult = feedbackRequestRepo.save(feedbackRequest);
             // MONGO
-            Set<Answer> answers = new HashSet<>();
-            List<Question> questions = questionRepo.findByIsPatternTrue();
-            questions.forEach(q -> answers.add(Answer.builder().questionId(q.getId()).build()));
             courseUsers.forEach(courseUser -> {
                         if (courseUser.getRole().equals(Role.USER)) {
                             feedbackRepo.save(Feedback.builder()
                                     .feedbackRequestId(feedbackRequestResult.getId())
                                     .userId(courseUser.getId())
                                     .isClosed(false)
-                                    .answer(answers)
+                                    .answer(new HashSet<>())
                                     .build()
                             );
                         }

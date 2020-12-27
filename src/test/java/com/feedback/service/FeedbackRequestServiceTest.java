@@ -1,15 +1,12 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.model.Answer;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
-import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackRequest;
-import com.feedback.repo.entity.Question;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +17,6 @@ import org.mockito.Mock;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
@@ -34,15 +30,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class FeedbackRequestServiceTest {
-
     @Mock
     private FeedbackRequestRepo feedbackRequestRepo;
     @Mock
     private CourseRepo courseRepo;
     @Mock
-    FeedbackRepo feedbackRepo;
-    @Mock
-    private QuestionRepo questionRepo;
+    private FeedbackRepo feedbackRepo;
 
     @InjectMocks
     private FeedbackRequestServiceImpl feedbackRequestServiceImpl;
@@ -55,7 +48,6 @@ class FeedbackRequestServiceTest {
     @AfterEach
     public void tearDown() {
         verifyNoMoreInteractions(feedbackRequestRepo);
-        verifyNoMoreInteractions(questionRepo);
         setOfUsers().forEach(user -> verifyNoMoreInteractions(feedbackRepo));
     }
 
@@ -63,7 +55,6 @@ class FeedbackRequestServiceTest {
     void testCreateFeedbackRequest() {
         when(courseRepo.findById(1L)).thenReturn(ofNullable(course()));
         when(feedbackRequestRepo.save(feedbackRequest())).thenReturn(feedbackRequestDB());
-        when(questionRepo.findByIsPatternTrue()).thenReturn(listOfQuestions());
         setOfUsers().forEach(user -> when(feedbackRepo.save(feedback(user))).thenReturn(feedbackDB(user)));
         // NOT_NULL
         FeedbackRequestDto requestDto = feedbackRequestServiceImpl.createFeedbackRequest(1L);
@@ -77,7 +68,6 @@ class FeedbackRequestServiceTest {
         assertNull(requestDtoNull);
 
         verify(feedbackRequestRepo).save(feedbackRequest());
-        verify(questionRepo).findByIsPatternTrue();
         setOfUsers().forEach(user -> verify(feedbackRepo).save(feedback(user)));
 
     }
@@ -131,38 +121,13 @@ class FeedbackRequestServiceTest {
         return feedbackRequest;
     }
 
-    private List<Question> listOfQuestions() {
-        return List.of(
-                Question.builder()
-                        .id(1L)
-                        .isPattern(true)
-                        .questionValue("First question")
-                        .build(),
-                Question.builder()
-                        .id(2L)
-                        .isPattern(true)
-                        .questionValue("Second question")
-                        .build()
-        );
-    }
-
-    Set<Answer> setOfAnswers() {
-        Set<Answer> setOfAnswers = new HashSet<>();
-        listOfQuestions().forEach(
-                q -> setOfAnswers.add(Answer.builder()
-                        .questionId(q.getId())
-                        .build()));
-        return setOfAnswers;
-    }
-
     private Feedback feedback(User user) {
         return Feedback.builder()
                 .isClosed(false)
                 .feedbackRequestId(feedbackRequestDB().getId())
                 .userId(user.getId())
                 .isClosed(false)
-                .answer(setOfAnswers())
-                .answer(setOfAnswers())
+                .answer(new HashSet<>())
                 .build();
     }
 

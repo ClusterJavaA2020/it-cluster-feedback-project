@@ -1,7 +1,7 @@
 package com.feedback.controller;
 
-import com.feedback.repo.entity.Question;
-import com.feedback.service.QuestionService;
+import com.feedback.model.Answer;
+import com.feedback.service.AnswerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +13,22 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class QuestionControllerTest {
+class AnswerControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private QuestionService questionService;
+    private AnswerService answerService;
 
     @BeforeEach
     void setUp() {
@@ -36,10 +37,13 @@ class QuestionControllerTest {
 
     @WithMockUser
     @Test
-    void testGetAllQuestions() throws Exception {
-        when(questionService.getAllQuestions()).thenReturn(listOfQuestions());
+    void testCreateAnswer() throws Exception {
+        when(answerService.createAnswer(1L, 1L, 1L)).thenReturn(answer());
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions")
+                .perform(post("/api/answers/")
+                        .param("feedbackRequestId", "1")
+                        .param("questionId", "1")
+                        .param("aboutUserId", "2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -48,44 +52,19 @@ class QuestionControllerTest {
 
     @WithMockUser
     @Test
-    void testGetPatterns() throws Exception {
-        when(questionService.getPatterns()).thenReturn(listOfQuestions());
+    void testGetQuestionsByFeedbackRequestId() throws Exception {
+        when(answerService.getQuestionsByFeedbackRequestId(105L)).thenReturn(Set.of(answer()));
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions/patterns")
+                .perform(get("/api/answers/")
+                        .param("feedbackRequestId", "105")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-
     }
 
-    @WithMockUser
-    @Test
-    void testGetNonPatterns() throws Exception {
-        when(questionService.getNonPatterns()).thenReturn(listOfQuestions());
-        MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions/non-patterns")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status()
-                        .isOk())
-                .andReturn();
-
-    }
-
-    private List<Question> listOfQuestions() {
-        Question question1 = Question.builder()
-                .id(1L)
-                .questionValue("Test question 1")
-                .isPattern(true)
-                .isRateable(true)
+    private Answer answer() {
+        return Answer.builder()
                 .build();
-        Question question2 = Question.builder()
-                .id(1L)
-                .questionValue("Test question 2")
-                .isPattern(false)
-                .isRateable(false)
-                .build();
-
-        return List.of(question1, question2);
     }
 }

@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class FeedbackRequestControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -47,8 +46,7 @@ class FeedbackRequestControllerTest {
     void testCreateFeedbackRequest() throws Exception {
         when(feedbackRequestService.createFeedbackRequest(1L)).thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(post("/feedback-requests/create")
-                        .param("courseId", "1")
+                .perform(post("/api/courses/1/feedback-requests")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -61,8 +59,7 @@ class FeedbackRequestControllerTest {
     void testGetFeedbackRequestList() throws Exception {
         when(feedbackRequestService.getFeedbackRequestList(1L)).thenReturn(List.of(feedbackRequestDto()));
         MvcResult mvcResult = mockMvc
-                .perform(get("/feedback-requests/all")
-                        .param("courseId", "1")
+                .perform(get("/api/courses/1/feedback-requests")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
