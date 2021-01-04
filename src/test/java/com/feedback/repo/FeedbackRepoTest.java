@@ -1,7 +1,6 @@
 package com.feedback.repo;
 
 import com.feedback.repo.entity.Feedback;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,11 +18,6 @@ class FeedbackRepoTest {
 
     @Autowired
     FeedbackRepo feedbackRepo;
-
-    @AfterEach
-    void clearDB() {
-        feedbackRepo.deleteAll();
-    }
 
     @Test
     void testFindById() {
