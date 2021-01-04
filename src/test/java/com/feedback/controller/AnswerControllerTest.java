@@ -38,12 +38,11 @@ class AnswerControllerTest {
     @WithMockUser
     @Test
     void testCreateAnswer() throws Exception {
-        when(answerService.createAnswer(1L, 1L, 1L)).thenReturn(answer());
+        when(answerService.createAnswer(1L, 1L, 1L, 1L)).thenReturn(answer());
         MvcResult mvcResult = mockMvc
-                .perform(post("/api/answers/")
-                        .param("feedbackRequestId", "1")
+                .perform(post("/courses/2/feedback-requests/105/answers")
                         .param("questionId", "1")
-                        .param("aboutUserId", "2")
+                        .param("teacherId", "2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -53,10 +52,9 @@ class AnswerControllerTest {
     @WithMockUser
     @Test
     void testGetQuestionsByFeedbackRequestId() throws Exception {
-        when(answerService.getQuestionsByFeedbackRequestId(105L)).thenReturn(Set.of(answer()));
+        when(answerService.getAnswersByFeedbackRequestId(2L, 105L)).thenReturn(Set.of(answer()));
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/answers/")
-                        .param("feedbackRequestId", "105")
+                .perform(get("/courses/2/feedback-requests/105/answers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())

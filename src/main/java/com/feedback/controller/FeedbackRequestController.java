@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/courses/")
+@RequestMapping("/courses/")
 public class FeedbackRequestController {
     private final FeedbackRequestService feedbackRequestService;
 
@@ -31,6 +31,6 @@ public class FeedbackRequestController {
 
     @GetMapping("{courseId}/feedback-requests/{feedbackRequestId}")
     public FeedbackRequestDto getFeedbackRequestById(@PathVariable Long courseId, @PathVariable Long feedbackRequestId) {
-        return feedbackRequestService.getFeedbackRequestById(feedbackRequestId);
+        return feedbackRequestService.getFeedbackRequestById(courseId, feedbackRequestId);
     }
 }

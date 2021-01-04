@@ -71,7 +71,11 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     }
 
     @Override
-    public FeedbackRequestDto getFeedbackRequestById(Long feedbackRequestId) {
-        return feedbackRequestRepo.findById(feedbackRequestId).map(FeedbackRequestDto::map).orElse(null);
+    public FeedbackRequestDto getFeedbackRequestById(Long courseId, Long feedbackRequestId) {
+        Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId);
+        if (feedbackRequest.isPresent() && feedbackRequest.get().getCourse().getId().equals(courseId)) {
+            return map(feedbackRequest.get());
+        }
+        return null;
     }
 }

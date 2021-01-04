@@ -1,6 +1,5 @@
 package com.feedback.service;
 
-import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
@@ -10,11 +9,9 @@ import java.util.List;
 @Service
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepo questionRepo;
-    private final FeedbackRepo feedbackRepo;
 
-    public QuestionServiceImpl(QuestionRepo questionRepo, FeedbackRepo feedbackRepo) {
+    public QuestionServiceImpl(QuestionRepo questionRepo) {
         this.questionRepo = questionRepo;
-        this.feedbackRepo = feedbackRepo;
     }
 
     @Override

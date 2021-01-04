@@ -2,25 +2,32 @@ package com.feedback.service;
 
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
+import com.feedback.repo.FeedbackRequestRepo;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.UserRepo;
+import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
+import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Question;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -31,6 +38,8 @@ class AnswerServiceImplTest {
     private UserRepo userRepo;
     @Mock
     private QuestionRepo questionRepo;
+    @Mock
+    private FeedbackRequestRepo feedbackRequestRepo;
 
     @InjectMocks
     private AnswerServiceImpl answerService;
@@ -40,21 +49,41 @@ class AnswerServiceImplTest {
         openMocks(this);
     }
 
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(userRepo, questionRepo, feedbackRepo, feedbackRequestRepo);
+    }
+
     @Test
     public void testCreateAnswer() {
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.ofNullable(feedbackRequest()));
         when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(listOfFeedback());
         when(questionRepo.findById(10L)).thenReturn(Optional.ofNullable(question()));
-        when(userRepo.findById(147L)).thenReturn(Optional.ofNullable(user()));
-        Answer answer = answerService.createAnswer(1L, 10L, 147L);
+        when(userRepo.findTeacherById(147L)).thenReturn(Optional.ofNullable(user()));
+        when(feedbackRepo.save(listOfFeedback().get(0))).thenReturn(listOfFeedback().get(0));
+        Answer answer = answerService.createAnswer(1L, 1L, 10L, 147L);
+        System.out.println();
         assertNotNull(answer);
         assertEquals(answer.getQuestionId(), question().getId());
-        assertEquals(answer.getAboutUserId(), user().getId());
+        assertEquals(answer.getTeacherId(), user().getId());
         assertEquals(answer.getRate(), 0);
         assertNull(answer.getComment());
-
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRepo).findByFeedbackRequestId(1L);
+        verify(questionRepo).findById(10L);
+        verify(userRepo).findTeacherById(147L);
         List<Feedback> feedbackList = listOfFeedback();
         feedbackList.forEach(feedback -> feedback.getAnswer().add(answer));
         feedbackList.forEach(feedback -> verify(feedbackRepo).save(feedback));
+    }
+
+    private FeedbackRequest feedbackRequest() {
+        return FeedbackRequest.builder()
+                .id(1L)
+                .course(Course.builder().id(1L).build())
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(END_DATE))
+                .build();
     }
 
     private Question question() {

@@ -39,7 +39,7 @@ class QuestionControllerTest {
     void testGetAllQuestions() throws Exception {
         when(questionService.getAllQuestions()).thenReturn(listOfQuestions());
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions")
+                .perform(get("/questions")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -51,7 +51,7 @@ class QuestionControllerTest {
     void testGetPatterns() throws Exception {
         when(questionService.getPatterns()).thenReturn(listOfQuestions());
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions/patterns")
+                .perform(get("/questions/patterns")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -64,7 +64,7 @@ class QuestionControllerTest {
     void testGetNonPatterns() throws Exception {
         when(questionService.getNonPatterns()).thenReturn(listOfQuestions());
         MvcResult mvcResult = mockMvc
-                .perform(get("/api/questions/non-patterns")
+                .perform(get("/questions/non-patterns")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())

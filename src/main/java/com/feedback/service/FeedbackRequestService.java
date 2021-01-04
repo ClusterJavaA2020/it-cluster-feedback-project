@@ -9,5 +9,5 @@ public interface FeedbackRequestService {
 
     List<FeedbackRequestDto> getFeedbackRequestList(Long courseId);
 
-    FeedbackRequestDto getFeedbackRequestById(Long feedbackRequestId);
+    FeedbackRequestDto getFeedbackRequestById(Long courseId, Long feedbackRequestId);
 }
