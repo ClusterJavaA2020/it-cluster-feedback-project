@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Answer {
     private Long questionId;
-    private Long aboutUserId;
-    private int rate;
+    private Long teacherId;
+    private Integer rate;
     private String comment;
 }

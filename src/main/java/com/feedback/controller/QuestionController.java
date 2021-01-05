@@ -17,7 +17,7 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<Question> getAllQuestions() {
         return questionService.getAllQuestions();
     }

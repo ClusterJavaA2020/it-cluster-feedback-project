@@ -30,9 +30,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/login", "/api/auth/register/**").permitAll()
+                .antMatchers("/auth/login", "/auth/register/**").permitAll()
                 .anyRequest()
                 .authenticated()
+                .and()
+                .cors()
                 .and()
                 .apply(jwtConfigurer);
     }

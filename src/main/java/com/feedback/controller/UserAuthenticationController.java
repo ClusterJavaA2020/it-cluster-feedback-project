@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class UserAuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -57,8 +57,7 @@ public class UserAuthenticationController {
     }
 
     @GetMapping("/register/confirm/{id}")
-    public void confirmEmail(@PathVariable String id){
+    public void confirmEmail(@PathVariable String id) {
         userService.confirmEmail(id);
     }
 }
-
