@@ -10,4 +10,6 @@ public interface QuestionService {
     List<Question> getPatterns();
 
     List<Question> getNonPatterns();
+
+    Question getQuestionById(Long questionId);
 }

@@ -72,6 +72,18 @@ class QuestionControllerTest {
 
     }
 
+    @WithMockUser
+    @Test
+    void testGetQuestionById() throws Exception {
+        when(questionService.getQuestionById(1L)).thenReturn(listOfQuestions().get(0));
+        MvcResult mvcResult = mockMvc
+                .perform(get("/questions/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+    }
+
     private List<Question> listOfQuestions() {
         Question question1 = Question.builder()
                 .id(1L)

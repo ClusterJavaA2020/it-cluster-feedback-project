@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -61,6 +62,34 @@ class FeedbackRequestControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(get("/courses/1/feedback-requests")
                         .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+    }
+
+    @WithMockUser
+    @Test
+    void testGetFeedbackRequestById() throws Exception {
+        when(feedbackRequestService.getFeedbackRequestById(10L, 12L)).thenReturn(feedbackRequestDto());
+        MvcResult mvcResult = mockMvc
+                .perform(get("/courses/10/feedback-requests/12")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+    }
+
+    @WithMockUser
+    @Test
+    void testUpdateFeedbackRequest() throws Exception {
+        when(feedbackRequestService.updateFeedbackRequest(15L, feedbackRequest())).thenReturn(feedbackRequestDto());
+        MvcResult mvcResult = mockMvc
+                .perform(put("/courses/10/feedback-requests/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"id\": 1, \"isActive\": true}"
+                        )
+                )
                 .andExpect(status()
                         .isOk())
                 .andReturn();

@@ -78,4 +78,16 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         }
         return null;
     }
+
+    @Override
+    public FeedbackRequestDto updateFeedbackRequest(Long courseId, FeedbackRequest feedbackRequest) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        Optional<FeedbackRequest> feedbackRequestUpdate = feedbackRequestRepo.findById(feedbackRequest.getId());
+        if (course.isPresent() && feedbackRequestUpdate.isPresent() &&
+                feedbackRequestUpdate.get().getCourse().getId().equals(courseId)) {
+            feedbackRequest.setCourse(course.get());
+            return map(feedbackRequestRepo.save(feedbackRequest));
+        }
+        return null;
+    }
 }

@@ -1,5 +1,7 @@
 package com.feedback.controller;
 
+import com.feedback.dto.AnswerDto;
+import com.feedback.dto.UserDto;
 import com.feedback.model.Answer;
 import com.feedback.service.AnswerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +53,8 @@ class AnswerControllerTest {
 
     @WithMockUser
     @Test
-    void testGetQuestionsByFeedbackRequestId() throws Exception {
-        when(answerService.getAnswersByFeedbackRequestId(2L, 105L)).thenReturn(Set.of(answer()));
+    void testGetAnswersByFeedbackRequestId() throws Exception {
+        when(answerService.getAnswersByFeedbackRequestId(2L, 105L)).thenReturn(Set.of(answerDto()));
         MvcResult mvcResult = mockMvc
                 .perform(get("/courses/2/feedback-requests/105/answers")
                         .accept(MediaType.APPLICATION_JSON))
@@ -63,6 +65,19 @@ class AnswerControllerTest {
 
     private Answer answer() {
         return Answer.builder()
+                .comment("comment")
+                .questionId(3L)
+                .rate(5)
+                .teacherId(4L)
+                .build();
+    }
+
+    private AnswerDto answerDto() {
+        return AnswerDto.builder()
+                .comment("comment")
+                .question("question")
+                .rate(4)
+                .teacher(UserDto.builder().build())
                 .build();
     }
 }
