@@ -1,6 +1,8 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.util.SwitcherDto;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.service.FeedbackRequestService;
@@ -45,9 +47,9 @@ class FeedbackRequestControllerTest {
     @WithMockUser
     @Test
     void testCreateFeedbackRequest() throws Exception {
-        when(feedbackRequestService.createFeedbackRequest(1L)).thenReturn(feedbackRequestDto());
+        when(feedbackRequestService.createFeedbackRequest(15L)).thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(post("/courses/1/feedback-requests")
+                .perform(post("/courses/15/feedback-requests")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -58,9 +60,9 @@ class FeedbackRequestControllerTest {
     @WithMockUser
     @Test
     void testGetFeedbackRequestList() throws Exception {
-        when(feedbackRequestService.getFeedbackRequestList(1L)).thenReturn(List.of(feedbackRequestDto()));
+        when(feedbackRequestService.getFeedbackRequestList(15L)).thenReturn(List.of(feedbackRequestDto()));
         MvcResult mvcResult = mockMvc
-                .perform(get("/courses/1/feedback-requests")
+                .perform(get("/courses/15/feedback-requests")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -70,9 +72,9 @@ class FeedbackRequestControllerTest {
     @WithMockUser
     @Test
     void testGetFeedbackRequestById() throws Exception {
-        when(feedbackRequestService.getFeedbackRequestById(10L, 12L)).thenReturn(feedbackRequestDto());
+        when(feedbackRequestService.getFeedbackRequestById(15L, 1L)).thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(get("/courses/10/feedback-requests/12")
+                .perform(get("/courses/15/feedback-requests/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
@@ -81,15 +83,13 @@ class FeedbackRequestControllerTest {
 
     @WithMockUser
     @Test
-    void testUpdateFeedbackRequest() throws Exception {
-        when(feedbackRequestService.updateFeedbackRequest(15L, feedbackRequest())).thenReturn(feedbackRequestDto());
+    void testUpdateFeedbackRequestActivation() throws Exception {
+        when(feedbackRequestService.updateFeedbackRequestActivation(15L, 1L, switcherDto()))
+                .thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
-                .perform(put("/courses/10/feedback-requests/")
+                .perform(put("/courses/15/feedback-requests/1/activation")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                "{\"id\": 1, \"isActive\": true}"
-                        )
-                )
+                        .content(new ObjectMapper().writeValueAsString(switcherDto())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
@@ -97,7 +97,7 @@ class FeedbackRequestControllerTest {
 
     private Course course() {
         return Course.builder()
-                .id(1L)
+                .id(15L)
                 .title("Mock course")
                 .description("This is the test course.")
                 .startDate(LocalDate.now())
@@ -116,5 +116,11 @@ class FeedbackRequestControllerTest {
 
     private FeedbackRequestDto feedbackRequestDto() {
         return map(feedbackRequest());
+    }
+
+    private SwitcherDto switcherDto() {
+        return SwitcherDto.builder()
+                .isActive(true)
+                .build();
     }
 }

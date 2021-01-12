@@ -1,7 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.repo.entity.FeedbackRequest;
+import com.feedback.util.SwitcherDto;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ public interface FeedbackRequestService {
 
     FeedbackRequestDto getFeedbackRequestById(Long courseId, Long feedbackRequestId);
 
-    FeedbackRequestDto updateFeedbackRequest(Long courseId, FeedbackRequest FeedbackRequest);
+    FeedbackRequestDto updateFeedbackRequestActivation(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
 }

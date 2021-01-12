@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.util.SwitcherDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -100,11 +101,13 @@ class FeedbackRequestServiceImplTest {
     }
 
     @Test
-    void updateFeedbackRequest() {
+    void testUpdateFeedbackRequestActivation() {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
         when(feedbackRequestRepo.save(feedbackRequestDB())).thenReturn(feedbackRequestDB());
-        FeedbackRequestDto feedbackRequestDto = feedbackRequestServiceImpl.updateFeedbackRequest(1L, feedbackRequestDB());
+        FeedbackRequestDto feedbackRequestDto =
+                feedbackRequestServiceImpl.updateFeedbackRequestActivation(1L, 1L,
+                        SwitcherDto.builder().isActive(false).build());
         assertNotNull(feedbackRequestDto);
         assertEquals(feedbackRequestDto.getId(), feedbackRequestDB().getId());
         assertEquals(feedbackRequestDto.getCourseId(), feedbackRequestDB().getId());

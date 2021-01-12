@@ -86,10 +86,10 @@ class AnswerServiceImplTest {
         when(userRepo.findTeacherById(147L)).thenReturn(Optional.of(user()));
         Set<AnswerDto> answerDtoResult = answerService.getAnswersByFeedbackRequestId(1L, 1L);
         assertNotNull(answerDtoResult);
-        for (AnswerDto result : answerDtoResult) {
-            assertEquals(result.getTeacher().getEmail(), user().getEmail());
-            assertEquals(result.getQuestion(), question().getQuestionValue());
-        }
+        answerDtoResult.forEach(item -> {
+            assertEquals(item.getTeacher().getEmail(), user().getEmail());
+            assertEquals(item.getQuestion(), question().getQuestionValue());
+        });
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackRepo).findByFeedbackRequestId(1L);
         verify(questionRepo).findById(10L);
