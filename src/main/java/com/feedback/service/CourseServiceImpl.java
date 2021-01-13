@@ -2,8 +2,11 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
+import com.feedback.exceptions.CannotCreateCourseWithoutTitle;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.entity.Role;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -21,12 +24,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto create(CourseDto dto) {
-        return map(courseRepo.save(map(dto)));
+        try {
+            return map(courseRepo.save(map(dto)));
+        }catch (DataIntegrityViolationException e){
+            throw new CannotCreateCourseWithoutTitle();
+        }
     }
 
     @Override
     public CourseDto get(Long id) {
-        return map(courseRepo.getOne(id));
+        return courseRepo.findCourseById(id).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override

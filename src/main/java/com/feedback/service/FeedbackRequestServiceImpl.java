@@ -1,15 +1,15 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.repo.*;
 import com.feedback.util.SwitcherDto;
-import com.feedback.repo.CourseRepo;
-import com.feedback.repo.FeedbackRepo;
-import com.feedback.repo.FeedbackRequestRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 
@@ -26,12 +27,17 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final CourseRepo courseRepo;
     private final FeedbackRepo feedbackRepo;
+    private final EmailSenderService emailSenderService;
+    private final UserRepo userRepo;
 
     public FeedbackRequestServiceImpl(FeedbackRequestRepo feedbackRequestRepo, CourseRepo courseRepo,
-                                      FeedbackRepo feedbackRepo) {
+                                      FeedbackRepo feedbackRepo,UserRepo userRepo,
+                                      EmailSenderService emailSenderService) {
         this.feedbackRequestRepo = feedbackRequestRepo;
         this.courseRepo = courseRepo;
         this.feedbackRepo = feedbackRepo;
+        this.userRepo=userRepo;
+        this.emailSenderService=emailSenderService;
     }
 
     @Override
@@ -89,5 +95,27 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;
+    }
+    @Override
+    @Scheduled(fixedDelay = 86400000)
+    public void reminder(){
+        List<Long> usersIdWhoHaveFeedbackRequest = feedbackRequestRepo.userId();
+        List<Long> allUserIdWhoResponded = feedbackRepo.findAll().stream().map(x->x.getUserId())
+                .collect(Collectors.toList());
+        usersIdWhoHaveFeedbackRequest.removeAll(allUserIdWhoResponded);
+        for (int i = 0;i<usersIdWhoHaveFeedbackRequest.size();i++) {
+            Optional<User> user = userRepo.findById(usersIdWhoHaveFeedbackRequest.get(i));
+            if (user.isPresent()){
+                final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+                simpleMailMessage.setTo(user.get().getEmail());
+                simpleMailMessage.setSubject("form");
+                simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
+                //user page is in process
+                simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.get().getId());
+                emailSenderService.sendEmail(simpleMailMessage);
+            }else {
+                System.out.println("problem");
+            }
+        }
     }
 }

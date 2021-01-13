@@ -62,4 +62,8 @@ public class UserServiceImpl implements UserService{
         simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/"+id);
         emailSenderService.sendEmail(simpleMailMessage);
     }
+    @Override
+    public User findUserById(Long id){
+        return userRepo.findById(id).orElseThrow(UserNotFoundException::new);
+    }
 }
