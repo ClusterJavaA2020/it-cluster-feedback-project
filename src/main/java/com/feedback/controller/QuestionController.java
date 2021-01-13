@@ -3,6 +3,7 @@ package com.feedback.controller;
 import com.feedback.repo.entity.Question;
 import com.feedback.service.QuestionService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +31,10 @@ public class QuestionController {
     @GetMapping("/non-patterns")
     public List<Question> getNonPatterns() {
         return questionService.getNonPatterns();
+    }
+
+    @GetMapping("/{questionId}")
+    public Question getQuestionById(@PathVariable Long questionId){
+        return questionService.getQuestionById(questionId);
     }
 }

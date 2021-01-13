@@ -1,5 +1,7 @@
 package com.feedback.service;
 
+import com.feedback.dto.AnswerDto;
+import com.feedback.dto.UserDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -10,6 +12,7 @@ import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,14 +53,22 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public Set<Answer> getAnswersByFeedbackRequestId(Long courseId, Long feedbackRequestId) {
+    public Set<AnswerDto> getAnswersByFeedbackRequestId(Long courseId, Long feedbackRequestId) {
         if (isValidRequestParams(courseId, feedbackRequestId)) {
             List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
             if (!feedbackList.isEmpty()) {
-                return feedbackList.get(0).getAnswer();
+                Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
+                Set<AnswerDto> answerDto = new HashSet<>();
+                answers.forEach(answer -> answerDto.add(AnswerDto.builder()
+                        .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
+                        .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(UserDto::map).orElse(null))
+                        .rate(answer.getRate())
+                        .comment(answer.getComment())
+                        .build()));
+                return answerDto;
             }
         }
-        return null;
+        return new HashSet<>();
     }
 
     private boolean isValidRequestParams(Long courseId, Long feedbackRequestId) {

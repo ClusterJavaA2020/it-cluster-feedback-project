@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.util.SwitcherDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -50,12 +51,12 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackRepo, courseRepo);
     }
 
     @Test
     void testCreateFeedbackRequest() {
-        when(courseRepo.findById(1L)).thenReturn(ofNullable(course()));
+        when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.save(feedbackRequest())).thenReturn(feedbackRequestDB());
         setOfUsers().forEach(user -> when(feedbackRepo.save(feedback(user))).thenReturn(feedbackDB(user)));
         // NOT_NULL
@@ -65,9 +66,11 @@ class FeedbackRequestServiceImplTest {
         assertEquals(requestDto.getStartDate(), feedbackRequest().getStartDate());
         assertEquals(requestDto.getEndDate(), feedbackRequest().getEndDate());
         assertEquals(requestDto.getId(), feedbackRequestDB().getId());
+        verify(courseRepo).findById(1L);
         // NULL
         FeedbackRequestDto requestDtoNull = feedbackRequestServiceImpl.createFeedbackRequest(2L);
         assertNull(requestDtoNull);
+        verify(courseRepo).findById(2L);
         verify(feedbackRequestRepo).save(feedbackRequest());
         setOfUsers().forEach(user -> verify(feedbackRepo).save(feedback(user)));
     }
@@ -88,13 +91,32 @@ class FeedbackRequestServiceImplTest {
     @Test
     void testGetFeedbackRequestById() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(ofNullable(feedbackRequest()));
-        Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(1L);
-        assertNotNull(feedbackRequest);
-        assertEquals(feedbackRequest.get().getCourse(), feedbackRequest().getCourse());
-        assertEquals(feedbackRequest.get().getStartDate(), feedbackRequest().getStartDate());
-        assertEquals(feedbackRequest.get().getEndDate(), feedbackRequest().getEndDate());
-        assertEquals(feedbackRequest.get().getUsers(), feedbackRequest().getUsers());
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestServiceImpl.getFeedbackRequestById(1L, 1L);
+        assertNotNull(feedbackRequestDto);
+        assertEquals(feedbackRequestDto.getCourseTitle(), feedbackRequest().getCourse().getTitle());
+        assertEquals(feedbackRequestDto.getCourseId(), feedbackRequest().getCourse().getId());
+        assertEquals(feedbackRequestDto.getStartDate(), feedbackRequest().getStartDate());
+        assertEquals(feedbackRequestDto.getEndDate(), feedbackRequest().getEndDate());
         verify(feedbackRequestRepo).findById(1L);
+    }
+
+    @Test
+    void testUpdateFeedbackRequestActivation() {
+        when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
+        when(feedbackRequestRepo.save(feedbackRequestDB())).thenReturn(feedbackRequestDB());
+        FeedbackRequestDto feedbackRequestDto =
+                feedbackRequestServiceImpl.updateFeedbackRequestActivation(1L, 1L,
+                        SwitcherDto.builder().isActive(false).build());
+        assertNotNull(feedbackRequestDto);
+        assertEquals(feedbackRequestDto.getId(), feedbackRequestDB().getId());
+        assertEquals(feedbackRequestDto.getCourseId(), feedbackRequestDB().getId());
+        assertEquals(feedbackRequestDto.getCourseTitle(), feedbackRequestDB().getCourse().getTitle());
+        assertEquals(feedbackRequestDto.getStartDate(), feedbackRequestDB().getStartDate());
+        assertEquals(feedbackRequestDto.getEndDate(), feedbackRequestDB().getEndDate());
+        verify(courseRepo).findById(1L);
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRequestRepo).save(feedbackRequestDB());
     }
 
     private Set<User> setOfUsers() {

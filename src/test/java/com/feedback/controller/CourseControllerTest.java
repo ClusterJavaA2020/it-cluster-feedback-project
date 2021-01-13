@@ -1,5 +1,6 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.User;
 import com.feedback.service.CourseService;
@@ -57,9 +58,7 @@ class CourseControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                "{\"title\": \"NODE.JS\"}"
-                        )                )
+                        .content(new ObjectMapper().writeValueAsString(course())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
@@ -72,9 +71,7 @@ class CourseControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(put("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                "{\"title\": \"NODE.JS\"}"
-                        )                )
+                        .content(new ObjectMapper().writeValueAsString(course())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();

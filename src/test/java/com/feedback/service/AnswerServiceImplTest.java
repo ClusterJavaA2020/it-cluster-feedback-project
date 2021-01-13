@@ -1,5 +1,6 @@
 package com.feedback.service;
 
+import com.feedback.dto.AnswerDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,7 +64,6 @@ class AnswerServiceImplTest {
         when(userRepo.findTeacherById(147L)).thenReturn(Optional.ofNullable(user()));
         when(feedbackRepo.save(listOfFeedback().get(0))).thenReturn(listOfFeedback().get(0));
         Answer answer = answerService.createAnswer(1L, 1L, 10L, 147L);
-        System.out.println();
         assertNotNull(answer);
         assertEquals(answer.getQuestionId(), question().getId());
         assertEquals(answer.getTeacherId(), user().getId());
@@ -75,6 +76,24 @@ class AnswerServiceImplTest {
         List<Feedback> feedbackList = listOfFeedback();
         feedbackList.forEach(feedback -> feedback.getAnswer().add(answer));
         feedbackList.forEach(feedback -> verify(feedbackRepo).save(feedback));
+    }
+
+    @Test
+    void testGetAnswersByFeedbackRequestId() {
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequest()));
+        when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(listOfFeedback());
+        when(questionRepo.findById(10L)).thenReturn(Optional.of(question()));
+        when(userRepo.findTeacherById(147L)).thenReturn(Optional.of(user()));
+        Set<AnswerDto> answerDtoResult = answerService.getAnswersByFeedbackRequestId(1L, 1L);
+        assertNotNull(answerDtoResult);
+        answerDtoResult.forEach(item -> {
+            assertEquals(item.getTeacher().getEmail(), user().getEmail());
+            assertEquals(item.getQuestion(), question().getQuestionValue());
+        });
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRepo).findByFeedbackRequestId(1L);
+        verify(questionRepo).findById(10L);
+        verify(userRepo).findTeacherById(147L);
     }
 
     private FeedbackRequest feedbackRequest() {
@@ -113,14 +132,24 @@ class AnswerServiceImplTest {
                         .isClosed(false)
                         .userId(5L)
                         .feedbackRequestId(1L)
-                        .answer(new HashSet<>())
+                        .answer(answerSet())
                         .build(),
                 Feedback.builder()
                         .isClosed(false)
                         .userId(4L)
                         .feedbackRequestId(1L)
-                        .answer(new HashSet<>())
+                        .answer(answerSet())
                         .build()
         );
+    }
+
+    private Set<Answer> answerSet() {
+        Set<Answer> answerSet = new HashSet<>();
+        answerSet.add(Answer.builder()
+                .teacherId(147L)
+                .rate(5)
+                .questionId(10L)
+                .build());
+        return answerSet;
     }
 }

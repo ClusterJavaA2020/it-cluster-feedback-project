@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.util.SwitcherDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -75,6 +76,17 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId);
         if (feedbackRequest.isPresent() && feedbackRequest.get().getCourse().getId().equals(courseId)) {
             return map(feedbackRequest.get());
+        }
+        return null;
+    }
+
+    @Override
+    public FeedbackRequestDto updateFeedbackRequestActivation(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId);
+        if (course.isPresent() && feedbackRequest.isPresent() && feedbackRequest.get().getCourse().getId().equals(courseId)) {
+            feedbackRequest.get().setActive(switcherDto.isActive());
+            return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package com.feedback.controller;
 
+import com.feedback.dto.AnswerDto;
 import com.feedback.model.Answer;
 import com.feedback.service.AnswerService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +30,8 @@ public class AnswerController {
     }
 
     @GetMapping("/courses/{courseId}/feedback-requests/{feedbackRequestId}/answers")
-    public Set<Answer> getAnswersByFeedbackRequestId(@PathVariable Long courseId,
-                                                     @PathVariable Long feedbackRequestId) {
+    public Set<AnswerDto> getAnswersByFeedbackRequestId(@PathVariable Long courseId,
+                                                        @PathVariable Long feedbackRequestId) {
         return answerService.getAnswersByFeedbackRequestId(courseId, feedbackRequestId);
     }
 }

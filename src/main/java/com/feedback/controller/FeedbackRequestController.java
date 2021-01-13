@@ -1,10 +1,13 @@
 package com.feedback.controller;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.util.SwitcherDto;
 import com.feedback.service.FeedbackRequestService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,5 +35,12 @@ public class FeedbackRequestController {
     @GetMapping("{courseId}/feedback-requests/{feedbackRequestId}")
     public FeedbackRequestDto getFeedbackRequestById(@PathVariable Long courseId, @PathVariable Long feedbackRequestId) {
         return feedbackRequestService.getFeedbackRequestById(courseId, feedbackRequestId);
+    }
+
+    @PutMapping("{courseId}/feedback-requests/{feedbackRequestId}/activation")
+    public FeedbackRequestDto updateFeedbackRequestActivation(@PathVariable Long courseId,
+                                                              @PathVariable Long feedbackRequestId,
+                                                              @RequestBody SwitcherDto switcherDto) {
+        return feedbackRequestService.updateFeedbackRequestActivation(courseId, feedbackRequestId, switcherDto);
     }
 }

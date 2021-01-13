@@ -28,4 +28,9 @@ public class QuestionServiceImpl implements QuestionService {
     public List<Question> getNonPatterns() {
         return questionRepo.findByIsPatternFalse();
     }
+
+    @Override
+    public Question getQuestionById(Long questionId) {
+        return questionRepo.findById(questionId).orElse(null);
+    }
 }
