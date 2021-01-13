@@ -33,7 +33,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto get(Long id) {
-        return courseRepo.findCourseById(id).orElseThrow(CourseNotFoundException::new);
+        return courseRepo.findById(id).map(CourseDto::map).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override
