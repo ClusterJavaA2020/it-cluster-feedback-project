@@ -57,7 +57,7 @@ public class AnswerServiceImpl implements AnswerService {
         if (isValidRequestParams(courseId, feedbackRequestId)) {
             List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
             if (!feedbackList.isEmpty()) {
-                Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(null);
+                Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
                 Set<AnswerDto> answerDto = new HashSet<>();
                 answers.forEach(answer -> answerDto.add(AnswerDto.builder()
                         .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
@@ -68,7 +68,7 @@ public class AnswerServiceImpl implements AnswerService {
                 return answerDto;
             }
         }
-        return null;
+        return new HashSet<>();
     }
 
     private boolean isValidRequestParams(Long courseId, Long feedbackRequestId) {
