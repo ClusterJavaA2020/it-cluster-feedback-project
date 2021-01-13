@@ -57,7 +57,7 @@ class AnswerServiceImplTest {
     }
 
     @Test
-    public void testCreateAnswer() {
+    void testCreateAnswer() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.ofNullable(feedbackRequest()));
         when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(listOfFeedback());
         when(questionRepo.findById(10L)).thenReturn(Optional.ofNullable(question()));
@@ -67,7 +67,7 @@ class AnswerServiceImplTest {
         assertNotNull(answer);
         assertEquals(answer.getQuestionId(), question().getId());
         assertEquals(answer.getTeacherId(), user().getId());
-        assertEquals(answer.getRate(), 0);
+        assertEquals(0, answer.getRate());
         assertNull(answer.getComment());
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackRepo).findByFeedbackRequestId(1L);
