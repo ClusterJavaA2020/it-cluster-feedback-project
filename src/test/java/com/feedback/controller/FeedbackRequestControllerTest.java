@@ -6,6 +6,7 @@ import com.feedback.util.SwitcherDto;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.service.FeedbackRequestService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import java.util.List;
 import static com.feedback.dto.FeedbackRequestDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,6 +47,11 @@ class FeedbackRequestControllerTest {
         openMocks(this);
     }
 
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(feedbackRequestService);
+    }
+
     @WithMockUser
     @Test
     void testCreateFeedbackRequest() throws Exception {
@@ -55,6 +63,7 @@ class FeedbackRequestControllerTest {
                         .isOk())
                 .andReturn();
         assertEquals(feedbackRequestDto(), map(feedbackRequest()));
+        verify(feedbackRequestService).createFeedbackRequest(15L);
     }
 
     @WithMockUser
@@ -67,6 +76,7 @@ class FeedbackRequestControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(feedbackRequestService).getFeedbackRequestList(15L);
     }
 
     @WithMockUser
@@ -79,6 +89,7 @@ class FeedbackRequestControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(feedbackRequestService).getFeedbackRequestById(15L, 1L);
     }
 
     @WithMockUser
@@ -93,6 +104,7 @@ class FeedbackRequestControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(feedbackRequestService).updateFeedbackRequestActivation(15L, 1L, switcherDto());
     }
 
     private Course course() {

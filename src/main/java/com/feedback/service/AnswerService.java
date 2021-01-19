@@ -10,4 +10,5 @@ public interface AnswerService {
 
     Set<AnswerDto> getAnswersByFeedbackRequestId(Long courseId, Long feedbackRequestId);
 
+    Set<AnswerDto> deleteAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId);
 }

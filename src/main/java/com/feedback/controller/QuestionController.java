@@ -1,10 +1,14 @@
 package com.feedback.controller;
 
+import com.feedback.dto.QuestionDto;
 import com.feedback.repo.entity.Question;
 import com.feedback.service.QuestionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,7 +38,20 @@ public class QuestionController {
     }
 
     @GetMapping("/{questionId}")
-    public Question getQuestionById(@PathVariable Long questionId){
+    public Question getQuestionById(@PathVariable Long questionId) {
         return questionService.getQuestionById(questionId);
+    }
+
+    @PostMapping
+    public Question addQuestion(@RequestBody QuestionDto questionDto) {
+        return questionService.addQuestion(questionDto);
+    }
+
+    @PostMapping("/answer")
+    public Question addCustomQuestion(@RequestBody QuestionDto questionDto,
+                                      @RequestParam Long courseId,
+                                      @RequestParam Long feedbackRequestId,
+                                      @RequestParam Long teacherId) {
+        return questionService.addCustomQuestion(questionDto, courseId, feedbackRequestId, teacherId);
     }
 }

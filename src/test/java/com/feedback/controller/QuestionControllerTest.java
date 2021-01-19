@@ -1,7 +1,9 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.repo.entity.Question;
 import com.feedback.service.QuestionService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,13 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
+import static com.feedback.dto.QuestionDto.map;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -34,6 +40,11 @@ class QuestionControllerTest {
         openMocks(this);
     }
 
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(questionService);
+    }
+
     @WithMockUser
     @Test
     void testGetAllQuestions() throws Exception {
@@ -44,6 +55,7 @@ class QuestionControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(questionService).getAllQuestions();
     }
 
     @WithMockUser
@@ -56,6 +68,7 @@ class QuestionControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(questionService).getPatterns();
 
     }
 
@@ -69,7 +82,7 @@ class QuestionControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-
+        verify(questionService).getNonPatterns();
     }
 
     @WithMockUser
@@ -82,6 +95,40 @@ class QuestionControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(questionService).getQuestionById(1L);
+    }
+
+    @WithMockUser
+    @Test
+    void testAddQuestion() throws Exception {
+        when(questionService.addQuestion(map(listOfQuestions().get(0)))).thenReturn(listOfQuestions().get(0));
+        MvcResult mvcResult = mockMvc
+                .perform(post("/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(map(listOfQuestions().get(0)))
+                        )
+                )
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(questionService).addQuestion(map(listOfQuestions().get(0)));
+    }
+
+    @WithMockUser
+    @Test
+    void testAddCustomQuestion() throws Exception {
+        when(questionService.addCustomQuestion(map(listOfQuestions().get(0)), 1l, 1L, 1L))
+                .thenReturn(listOfQuestions().get(0));
+        MvcResult mvcResult = mockMvc
+                .perform(post("/questions/answer?courseId=1&feedbackRequestId=1&teacherId=1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(map(listOfQuestions().get(0)))
+                        )
+                )
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(questionService).addCustomQuestion(map(listOfQuestions().get(0)), 1l, 1L, 1L);
     }
 
     private List<Question> listOfQuestions() {

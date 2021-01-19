@@ -96,6 +96,21 @@ class AnswerServiceImplTest {
         verify(userRepo).findTeacherById(147L);
     }
 
+    @Test
+    void testDeleteAnswer() {
+        when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(listOfFeedback());
+        when(userRepo.findTeacherById(147L)).thenReturn(Optional.ofNullable(user()));
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.ofNullable(feedbackRequest()));
+        when(feedbackRepo.saveAll(listOfFeedbackNoAnswers())).thenReturn(listOfFeedbackNoAnswers());
+        Set<AnswerDto> answerDtoSet = answerService.deleteAnswer(1L, 1L, 10L, 147L);
+        assertNotNull(answerDtoSet);
+        assertEquals(new HashSet<>(), answerDtoSet);
+        verify(feedbackRepo).findByFeedbackRequestId(1L);
+        verify(userRepo).findTeacherById(147L);
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRepo).saveAll(listOfFeedbackNoAnswers());
+    }
+
     private FeedbackRequest feedbackRequest() {
         return FeedbackRequest.builder()
                 .id(1L)
@@ -141,6 +156,12 @@ class AnswerServiceImplTest {
                         .answer(answerSet())
                         .build()
         );
+    }
+
+    private List<Feedback> listOfFeedbackNoAnswers() {
+        List<Feedback> feedbackSet = listOfFeedback();
+        feedbackSet.stream().map(Feedback::getAnswer).forEach(a -> a.removeIf(s -> s.getQuestionId().equals(10L)));
+        return feedbackSet;
     }
 
     private Set<Answer> answerSet() {

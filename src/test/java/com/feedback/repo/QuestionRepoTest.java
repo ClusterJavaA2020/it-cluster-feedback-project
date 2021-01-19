@@ -26,10 +26,19 @@ class QuestionRepoTest {
     @Test
     void testFindByIsPatternFalse() {
         Question question = questionList().get(0);
+        question.setQuestionValue("testFindByIsPatternFalse");
         Question save = questionRepo.save(question);
         List<Question> result = questionRepo.findByIsPatternFalse();
         assertFalse(result.isEmpty());
-        assertEquals(save, result.get(0));
+        assertEquals(save, question);
+    }
+
+    @Test
+    void testFindByQuestionValue() {
+        Question question = questionList().get(0);
+        Question save = questionRepo.save(question);
+        Question find = questionRepo.findByQuestionValue(questionList().get(0).getQuestionValue());
+        assertEquals(save, find);
     }
 
     private List<Question> questionList() {

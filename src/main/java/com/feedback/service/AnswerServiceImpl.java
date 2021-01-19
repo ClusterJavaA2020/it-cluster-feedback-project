@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -58,17 +60,44 @@ public class AnswerServiceImpl implements AnswerService {
             List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
             if (!feedbackList.isEmpty()) {
                 Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
-                Set<AnswerDto> answerDto = new HashSet<>();
-                answers.forEach(answer -> answerDto.add(AnswerDto.builder()
+                return mapAnswerSet(answers);
+            }
+        }
+        return new HashSet<>();
+    }
+
+    @Override
+    public Set<AnswerDto> deleteAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId) {
+        List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
+        if (teacherId != 0 && userRepo.findTeacherById(teacherId).isEmpty()) {
+            return new HashSet<>();
+        }
+        Long finalTeacherId = teacherId == 0L ? null : teacherId;
+        if (isValidRequestParams(courseId, feedbackRequestId) && !feedbackList.isEmpty()) {
+            feedbackList.stream()
+                    .map(Feedback::getAnswer)
+                    .forEach(answers ->
+                            answers.removeIf(answer ->
+                                    answer.getQuestionId().equals(questionId) &&
+                                            Objects.equals(answer.getTeacherId(), finalTeacherId)
+                            )
+                    );
+            feedbackRepo.saveAll(feedbackList);
+            Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
+            return mapAnswerSet(answers);
+        }
+        return new HashSet<>();
+    }
+
+    private Set<AnswerDto> mapAnswerSet(Set<Answer> answerSet) {
+        return answerSet.stream().map(answer ->
+                AnswerDto.builder()
+                        .questionId(answer.getQuestionId())
                         .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
                         .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(UserDto::map).orElse(null))
                         .rate(answer.getRate())
                         .comment(answer.getComment())
-                        .build()));
-                return answerDto;
-            }
-        }
-        return new HashSet<>();
+                        .build()).collect(Collectors.toSet());
     }
 
     private boolean isValidRequestParams(Long courseId, Long feedbackRequestId) {
