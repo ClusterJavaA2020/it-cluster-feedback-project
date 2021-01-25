@@ -114,35 +114,16 @@ class QuestionControllerTest {
         verify(questionService).addQuestion(map(listOfQuestions().get(0)));
     }
 
-    @WithMockUser
-    @Test
-    void testAddCustomQuestion() throws Exception {
-        when(questionService.addCustomQuestion(map(listOfQuestions().get(0)), 1l, 1L, 1L))
-                .thenReturn(listOfQuestions().get(0));
-        MvcResult mvcResult = mockMvc
-                .perform(post("/questions/answer?courseId=1&feedbackRequestId=1&teacherId=1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(map(listOfQuestions().get(0)))
-                        )
-                )
-                .andExpect(status()
-                        .isOk())
-                .andReturn();
-        verify(questionService).addCustomQuestion(map(listOfQuestions().get(0)), 1l, 1L, 1L);
-    }
-
     private List<Question> listOfQuestions() {
         Question question1 = Question.builder()
                 .id(1L)
                 .questionValue("Test question 1")
                 .isPattern(true)
-                .isRateable(true)
                 .build();
         Question question2 = Question.builder()
-                .id(1L)
+                .id(2L)
                 .questionValue("Test question 2")
                 .isPattern(false)
-                .isRateable(false)
                 .build();
 
         return List.of(question1, question2);

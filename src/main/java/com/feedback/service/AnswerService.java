@@ -6,9 +6,9 @@ import com.feedback.model.Answer;
 import java.util.Set;
 
 public interface AnswerService {
-    Answer createAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId);
+    Answer createAnswer(Long courseId, Long feedbackRequestId, Answer answer);
 
     Set<AnswerDto> getAnswersByFeedbackRequestId(Long courseId, Long feedbackRequestId);
 
-    Set<AnswerDto> deleteAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId);
+    Set<Answer> deleteAnswer(Long courseId, Long feedbackRequestId, Answer answer);
 }

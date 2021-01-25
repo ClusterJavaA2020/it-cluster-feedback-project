@@ -14,12 +14,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -37,11 +34,8 @@ public class FeedbackRequest {
     private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean isActive = false;
-
-    @EqualsAndHashCode.Exclude
-    @ManyToMany(mappedBy = "feedbackRequests", fetch = FetchType.LAZY)
-    private Set<User> users = new HashSet<>();
+    private boolean isActive;
+    private boolean isFinished;
 
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,9 +1,6 @@
 package com.feedback.service;
 
-import com.feedback.model.Answer;
-import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.QuestionRepo;
-import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.Question;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static com.feedback.dto.QuestionDto.map;
@@ -25,12 +21,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 class QuestionServiceImplTest {
     @Mock
     private QuestionRepo questionRepo;
-
-    @Mock
-    private FeedbackRepo feedbackRepo;
-
-    @Mock
-    private AnswerService answerService;
 
     @InjectMocks
     private QuestionServiceImpl questionService;
@@ -87,57 +77,18 @@ class QuestionServiceImplTest {
         verify(questionRepo).save(questions().get(0));
     }
 
-    @Test
-    void addCustomQuestion() {
-        Question questionNew = questions().get(0);
-        Question questionFromDb = questions().get(0);
-        questionFromDb.setRateable(false);
-        questionFromDb.setPattern(true);
-        when(questionRepo.findByQuestionValue("Some first custom question?")).thenReturn(questionFromDb);
-        when(questionRepo.save(questionNew)).thenReturn(questionFromDb);
-        when(feedbackRepo.findByFeedbackRequestId(23L)).thenReturn(List.of(feedback()));
-        when(feedbackRepo.saveAll(List.of(feedback()))).thenReturn(List.of(feedback()));
-        when(answerService.createAnswer(1L, 23L, 1L, 2L)).thenReturn(answer());
-        Question questionResult = questionService.addCustomQuestion(map(questionNew), 1L, 23L, 2L);
-        assertEquals(questionNew, questionResult);
-        verify(questionRepo).findByQuestionValue("Some first custom question?");
-        verify(questionRepo).save(questions().get(0));
-        verify(feedbackRepo).findByFeedbackRequestId(23L);
-        verify(feedbackRepo).saveAll(List.of(feedback()));
-        verify(answerService).createAnswer(1L, 23L, 1L, 2L);
-    }
-
     private List<Question> questions() {
         return List.of(Question.builder()
                         .id(1L)
-                        .isRateable(true)
                         .isPattern(false)
                         .questionValue("Some first custom question?")
                         .build(),
                 Question.builder()
                         .id(2L)
-                        .isRateable(false)
                         .isPattern(true)
                         .questionValue("Some second custom question?")
                         .build()
         );
     }
 
-    private Feedback feedback() {
-        return Feedback.builder()
-                .isClosed(false)
-                .feedbackRequestId(23L)
-                .userId(1L)
-                .isClosed(false)
-                .answer(new HashSet<>())
-                .build();
-    }
-
-    private Answer answer() {
-        return Answer.builder()
-                .teacherId(147L)
-                .rate(0)
-                .questionId(147L)
-                .build();
-    }
 }

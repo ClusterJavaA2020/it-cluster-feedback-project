@@ -43,12 +43,10 @@ class QuestionRepoTest {
 
     private List<Question> questionList() {
         return List.of(Question.builder()
-                        .isRateable(true)
                         .isPattern(false)
                         .questionValue("Some first question?")
                         .build(),
                 Question.builder()
-                        .isRateable(false)
                         .isPattern(true)
                         .questionValue("Some second question?")
                         .build()

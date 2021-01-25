@@ -12,5 +12,5 @@ public interface FeedbackRequestService {
 
     FeedbackRequestDto getFeedbackRequestById(Long courseId, Long feedbackRequestId);
 
-    FeedbackRequestDto updateFeedbackRequestActivation(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
+    FeedbackRequestDto activateFeedbackRequest(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
 }

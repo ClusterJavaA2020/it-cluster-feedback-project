@@ -2,10 +2,10 @@ package com.feedback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.util.SwitcherDto;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.service.FeedbackRequestService;
+import com.feedback.util.SwitcherDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +23,12 @@ import java.util.List;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,7 +61,6 @@ class FeedbackRequestControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        assertEquals(feedbackRequestDto(), map(feedbackRequest()));
         verify(feedbackRequestService).createFeedbackRequest(15L);
     }
 
@@ -94,8 +92,8 @@ class FeedbackRequestControllerTest {
 
     @WithMockUser
     @Test
-    void testUpdateFeedbackRequestActivation() throws Exception {
-        when(feedbackRequestService.updateFeedbackRequestActivation(15L, 1L, switcherDto()))
+    void testActivateFeedbackRequest() throws Exception {
+        when(feedbackRequestService.activateFeedbackRequest(15L, 1L, switcherDto()))
                 .thenReturn(feedbackRequestDto());
         MvcResult mvcResult = mockMvc
                 .perform(put("/courses/15/feedback-requests/1/activation")
@@ -104,7 +102,7 @@ class FeedbackRequestControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        verify(feedbackRequestService).updateFeedbackRequestActivation(15L, 1L, switcherDto());
+        verify(feedbackRequestService).activateFeedbackRequest(15L, 1L, switcherDto());
     }
 
     private Course course() {

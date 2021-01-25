@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,13 +44,5 @@ public class QuestionController {
     @PostMapping
     public Question addQuestion(@RequestBody QuestionDto questionDto) {
         return questionService.addQuestion(questionDto);
-    }
-
-    @PostMapping("/answer")
-    public Question addCustomQuestion(@RequestBody QuestionDto questionDto,
-                                      @RequestParam Long courseId,
-                                      @RequestParam Long feedbackRequestId,
-                                      @RequestParam Long teacherId) {
-        return questionService.addCustomQuestion(questionDto, courseId, feedbackRequestId, teacherId);
     }
 }

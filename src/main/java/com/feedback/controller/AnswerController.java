@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -25,9 +25,8 @@ public class AnswerController {
     @PostMapping("/courses/{courseId}/feedback-requests/{feedbackRequestId}/answers")
     public Answer createAnswer(@PathVariable Long courseId,
                                @PathVariable Long feedbackRequestId,
-                               @RequestParam Long questionId,
-                               @RequestParam Long teacherId) {
-        return answerService.createAnswer(courseId, feedbackRequestId, questionId, teacherId);
+                               @RequestBody Answer answer) {
+        return answerService.createAnswer(courseId, feedbackRequestId, answer);
     }
 
     @GetMapping("/courses/{courseId}/feedback-requests/{feedbackRequestId}/answers")
@@ -37,11 +36,10 @@ public class AnswerController {
     }
 
     @DeleteMapping("/courses/{courseId}/feedback-requests/{feedbackRequestId}/answers")
-    public Set<AnswerDto> deleteAnswer(@PathVariable Long courseId,
-                                       @PathVariable Long feedbackRequestId,
-                                       @RequestParam Long questionId,
-                                       @RequestParam Long teacherId) {
-        return answerService.deleteAnswer(courseId, feedbackRequestId, questionId, teacherId);
+    public Set<Answer> deleteAnswer(@PathVariable Long courseId,
+                                    @PathVariable Long feedbackRequestId,
+                                    @RequestBody Answer answer) {
+        return answerService.deleteAnswer(courseId, feedbackRequestId, answer);
     }
 }
 

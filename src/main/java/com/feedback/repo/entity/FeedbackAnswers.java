@@ -16,13 +16,10 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 
-@Document(collection = "feedback")
-public class Feedback {
+@Document(collection = "answers")
+public class FeedbackAnswers {
     @Id
     private String id;
-    private Long userId;
     private Long feedbackRequestId;
-    private boolean isActive;
-    private boolean isSubmitted;
     private Set<Answer> answers = new LinkedHashSet<>();
 }

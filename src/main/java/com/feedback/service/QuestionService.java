@@ -16,5 +16,4 @@ public interface QuestionService {
 
     Question addQuestion(QuestionDto questionDto);
 
-    Question addCustomQuestion(QuestionDto questionDto, Long courseId, Long feedbackRequestId, Long teacherId);
 }

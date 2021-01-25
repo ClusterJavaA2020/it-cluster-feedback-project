@@ -1,5 +1,6 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.UserDto;
 import com.feedback.model.Answer;
@@ -49,16 +50,15 @@ class AnswerControllerTest {
     @WithMockUser
     @Test
     void testCreateAnswer() throws Exception {
-        when(answerService.createAnswer(2L, 105L, 3L, 4L)).thenReturn(answer());
+        when(answerService.createAnswer(2L, 105L, answer())).thenReturn(answer());
         MvcResult mvcResult = mockMvc
                 .perform(post("/courses/2/feedback-requests/105/answers")
-                        .param("questionId", "3")
-                        .param("teacherId", "4")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(answer())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        verify(answerService).createAnswer(2L, 105L, 3L, 4L);
+        verify(answerService).createAnswer(2L, 105L, answer());
     }
 
     @WithMockUser
@@ -77,14 +77,15 @@ class AnswerControllerTest {
     @WithMockUser
     @Test
     void testDeleteAnswer() throws Exception {
-        when(answerService.deleteAnswer(2L, 105L, 3L, 4L)).thenReturn(Set.of(answerDto()));
+        when(answerService.deleteAnswer(2L, 105L, answer())).thenReturn(Set.of(answer()));
         MvcResult mvcResult = mockMvc
-                .perform(delete("/courses/2/feedback-requests/105/answers?questionId=3&teacherId=4")
-                        .accept(MediaType.APPLICATION_JSON))
+                .perform(delete("/courses/2/feedback-requests/105/answers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(answer())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        verify(answerService).deleteAnswer(2L, 105L, 3L, 4L);
+        verify(answerService).deleteAnswer(2L, 105L, answer());
     }
 
     private Answer answer() {
@@ -99,9 +100,10 @@ class AnswerControllerTest {
     private AnswerDto answerDto() {
         return AnswerDto.builder()
                 .comment("comment")
+                .questionId(3L)
                 .question("question")
-                .rate(4)
-                .teacher(UserDto.builder().build())
+                .rate(5)
+                .teacher(UserDto.builder().id(4L).build())
                 .build();
     }
 }

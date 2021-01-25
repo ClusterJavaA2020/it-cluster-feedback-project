@@ -3,52 +3,46 @@ package com.feedback.service;
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.UserDto;
 import com.feedback.model.Answer;
-import com.feedback.repo.FeedbackRepo;
+import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRequestRepo;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.UserRepo;
-import com.feedback.repo.entity.Feedback;
+import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
-    private final FeedbackRepo feedbackRepo;
     private final UserRepo userRepo;
     private final QuestionRepo questionRepo;
     private final FeedbackRequestRepo feedbackRequestRepo;
+    private final FeedbackAnswersRepo feedbackAnswersRepo;
 
-    public AnswerServiceImpl(FeedbackRepo feedbackRepo, UserRepo userRepo, QuestionRepo questionRepo,
-                             FeedbackRequestRepo feedbackRequestRepo) {
-        this.feedbackRepo = feedbackRepo;
+    public AnswerServiceImpl(UserRepo userRepo, QuestionRepo questionRepo, FeedbackRequestRepo feedbackRequestRepo,
+                             FeedbackAnswersRepo feedbackAnswersRepo) {
         this.userRepo = userRepo;
         this.questionRepo = questionRepo;
         this.feedbackRequestRepo = feedbackRequestRepo;
+        this.feedbackAnswersRepo = feedbackAnswersRepo;
     }
 
     @Override
-    public Answer createAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId) {
-        List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
-        Question question = questionRepo.findById(questionId).orElse(null);
-        if (teacherId != 0 && userRepo.findTeacherById(teacherId).isEmpty()) {
+    public Answer createAnswer(Long courseId, Long feedbackRequestId, Answer answer) {
+        FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
+        FeedbackAnswers feedbackAnswers = feedbackAnswersRepo.findByFeedbackRequestId(feedbackRequestId);
+        Question question = questionRepo.findById(answer.getQuestionId()).orElse(null);
+        if (answer.getTeacherId() != null && userRepo.findTeacherById(answer.getTeacherId()).isEmpty()) {
             return null;
         }
-        if (isValidRequestParams(courseId, feedbackRequestId) && question != null) {
-            Answer answer = Answer.builder()
-                    .questionId(questionId)
-                    .teacherId(teacherId == 0 ? null : teacherId)
-                    .rate(question.isRateable() ? 0 : null)
-                    .comment(question.isRateable() ? null : "")
-                    .build();
-            feedbackList.forEach(f -> f.getAnswer().add(answer));
-            feedbackList.forEach(feedbackRepo::save);
+        if (isValidRequestParams(courseId, feedbackRequest) && !feedbackRequest.isActive() && question != null) {
+            feedbackAnswers.getAnswers().add(answer);
+            feedbackAnswersRepo.save(feedbackAnswers);
             return answer;
         }
         return null;
@@ -56,52 +50,35 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public Set<AnswerDto> getAnswersByFeedbackRequestId(Long courseId, Long feedbackRequestId) {
-        if (isValidRequestParams(courseId, feedbackRequestId)) {
-            List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
-            if (!feedbackList.isEmpty()) {
-                Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
-                return mapAnswerSet(answers);
+        FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
+        if (isValidRequestParams(courseId, feedbackRequest)) {
+            FeedbackAnswers feedbackAnswers = feedbackAnswersRepo.findByFeedbackRequestId(feedbackRequestId);
+            if (feedbackAnswers != null) {
+                return feedbackAnswers.getAnswers().stream().map(answer ->
+                        AnswerDto.builder()
+                                .questionId(answer.getQuestionId())
+                                .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
+                                .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(UserDto::map).orElse(null))
+                                .rate(answer.getRate())
+                                .comment(answer.getComment())
+                                .build()).collect(Collectors.toCollection(LinkedHashSet::new));
             }
         }
-        return new HashSet<>();
+        return Collections.emptySet();
     }
 
     @Override
-    public Set<AnswerDto> deleteAnswer(Long courseId, Long feedbackRequestId, Long questionId, Long teacherId) {
-        List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
-        if (teacherId != 0 && userRepo.findTeacherById(teacherId).isEmpty()) {
-            return new HashSet<>();
-        }
-        Long finalTeacherId = teacherId == 0L ? null : teacherId;
-        if (isValidRequestParams(courseId, feedbackRequestId) && !feedbackList.isEmpty()) {
-            feedbackList.stream()
-                    .map(Feedback::getAnswer)
-                    .forEach(answers ->
-                            answers.removeIf(answer ->
-                                    answer.getQuestionId().equals(questionId) &&
-                                            Objects.equals(answer.getTeacherId(), finalTeacherId)
-                            )
-                    );
-            feedbackRepo.saveAll(feedbackList);
-            Set<Answer> answers = feedbackList.stream().findFirst().map(Feedback::getAnswer).orElse(new HashSet<>());
-            return mapAnswerSet(answers);
-        }
-        return new HashSet<>();
-    }
-
-    private Set<AnswerDto> mapAnswerSet(Set<Answer> answerSet) {
-        return answerSet.stream().map(answer ->
-                AnswerDto.builder()
-                        .questionId(answer.getQuestionId())
-                        .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
-                        .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(UserDto::map).orElse(null))
-                        .rate(answer.getRate())
-                        .comment(answer.getComment())
-                        .build()).collect(Collectors.toSet());
-    }
-
-    private boolean isValidRequestParams(Long courseId, Long feedbackRequestId) {
+    public Set<Answer> deleteAnswer(Long courseId, Long feedbackRequestId, Answer answerToRemove) {
+        FeedbackAnswers feedbackAnswers = feedbackAnswersRepo.findByFeedbackRequestId(feedbackRequestId);
         FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
+        if (isValidRequestParams(courseId, feedbackRequest) && !feedbackRequest.isActive()) {
+            feedbackAnswers.getAnswers().removeIf(a -> a.equals(answerToRemove));
+            return feedbackAnswersRepo.save(feedbackAnswers).getAnswers();
+        }
+        return Collections.emptySet();
+    }
+
+    private boolean isValidRequestParams(Long courseId, FeedbackRequest feedbackRequest) {
         return feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId);
     }
 }

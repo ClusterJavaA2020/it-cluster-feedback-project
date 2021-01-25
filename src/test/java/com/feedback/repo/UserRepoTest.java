@@ -25,7 +25,6 @@ class UserRepoTest {
         Optional<User> byId = userRepo.findById(user.getId());
         assertTrue(byId.isPresent());
         byId.get().setCourses(null);
-        byId.get().setFeedbackRequests(null);
         assertEquals(user, byId.get());
     }
 
