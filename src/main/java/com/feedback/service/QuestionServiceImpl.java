@@ -1,10 +1,13 @@
 package com.feedback.service;
 
+import com.feedback.dto.QuestionDto;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.feedback.dto.QuestionDto.map;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -33,4 +36,19 @@ public class QuestionServiceImpl implements QuestionService {
     public Question getQuestionById(Long questionId) {
         return questionRepo.findById(questionId).orElse(null);
     }
+
+    @Override
+    public Question addQuestion(QuestionDto questionDto) {
+        if (questionDto.getQuestionValue() == null) {
+            return null;
+        }
+        Question question = questionRepo.findByQuestionValue(questionDto.getQuestionValue());
+        if (question == null) {
+            return questionRepo.save(map(questionDto));
+        } else {
+            question.setPattern(questionDto.isPattern());
+            return questionRepo.save(question);
+        }
+    }
+
 }

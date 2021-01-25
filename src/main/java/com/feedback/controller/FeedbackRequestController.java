@@ -38,9 +38,9 @@ public class FeedbackRequestController {
     }
 
     @PutMapping("{courseId}/feedback-requests/{feedbackRequestId}/activation")
-    public FeedbackRequestDto updateFeedbackRequestActivation(@PathVariable Long courseId,
-                                                              @PathVariable Long feedbackRequestId,
-                                                              @RequestBody SwitcherDto switcherDto) {
-        return feedbackRequestService.updateFeedbackRequestActivation(courseId, feedbackRequestId, switcherDto);
+    public FeedbackRequestDto activateFeedbackRequest(@PathVariable Long courseId,
+                                                      @PathVariable Long feedbackRequestId,
+                                                      @RequestBody SwitcherDto switcherDto) {
+        return feedbackRequestService.activateFeedbackRequest(courseId, feedbackRequestId, switcherDto);
     }
 }

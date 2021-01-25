@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.User;
 import com.feedback.service.CourseService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.Set;
 
 import static com.feedback.dto.CourseDto.map;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,6 +42,12 @@ class CourseControllerTest {
         openMocks(this);
     }
 
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(courseService);
+    }
+
+
     @WithMockUser
     @Test
     void testGetCourses() throws Exception {
@@ -49,6 +58,7 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).getAll();
     }
 
     @WithMockUser
@@ -62,6 +72,7 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).create(map(course()));
     }
 
     @WithMockUser
@@ -75,6 +86,7 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).update(map(course()));
     }
 
     @WithMockUser
@@ -87,6 +99,7 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).get(1L);
     }
 
     @WithMockUser
@@ -100,12 +113,13 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).getCourseTeachers(1L);
     }
 
     @WithMockUser
     @Test
     void testGetCourseStudents() throws Exception {
-        when(courseService.getCourseTeachers(1L))
+        when(courseService.getCourseStudents(1L))
                 .thenReturn(Set.of(com.feedback.dto.UserDto.map((User.builder().build()))));
         MvcResult mvcResult = mockMvc
                 .perform(get("/courses/1/students")
@@ -113,6 +127,7 @@ class CourseControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(courseService).getCourseStudents(1L);
     }
 
     private Course course() {

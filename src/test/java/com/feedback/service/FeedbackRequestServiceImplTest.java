@@ -1,15 +1,17 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.util.SwitcherDto;
 import com.feedback.repo.CourseRepo;
+import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
+import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
+import com.feedback.util.SwitcherDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,6 +43,8 @@ class FeedbackRequestServiceImplTest {
     private CourseRepo courseRepo;
     @Mock
     private FeedbackRepo feedbackRepo;
+    @Mock
+    private FeedbackAnswersRepo feedbackAnswersRepo;
 
     @InjectMocks
     private FeedbackRequestServiceImpl feedbackRequestServiceImpl;
@@ -51,28 +56,26 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackRepo, courseRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo);
     }
 
     @Test
     void testCreateFeedbackRequest() {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.save(feedbackRequest())).thenReturn(feedbackRequestDB());
-        setOfUsers().forEach(user -> when(feedbackRepo.save(feedback(user))).thenReturn(feedbackDB(user)));
+        when(feedbackAnswersRepo.save(feedbackAnswers())).thenReturn(feedbackAnswersDB());
         // NOT_NULL
         FeedbackRequestDto requestDto = feedbackRequestServiceImpl.createFeedbackRequest(1L);
         assertNotNull(requestDto);
-        assertEquals(requestDto.getCourseTitle(), feedbackRequest().getCourse().getTitle());
-        assertEquals(requestDto.getStartDate(), feedbackRequest().getStartDate());
-        assertEquals(requestDto.getEndDate(), feedbackRequest().getEndDate());
-        assertEquals(requestDto.getId(), feedbackRequestDB().getId());
+        assertEquals(map(feedbackRequestDB()), requestDto);
         verify(courseRepo).findById(1L);
+        verify(feedbackRequestRepo).save(feedbackRequest());
+        verify(feedbackAnswersRepo).save(feedbackAnswers());
         // NULL
         FeedbackRequestDto requestDtoNull = feedbackRequestServiceImpl.createFeedbackRequest(2L);
         assertNull(requestDtoNull);
         verify(courseRepo).findById(2L);
         verify(feedbackRequestRepo).save(feedbackRequest());
-        setOfUsers().forEach(user -> verify(feedbackRepo).save(feedback(user)));
     }
 
     @Test
@@ -101,22 +104,22 @@ class FeedbackRequestServiceImplTest {
     }
 
     @Test
-    void testUpdateFeedbackRequestActivation() {
+    void testActivateFeedbackRequest() {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
-        when(feedbackRequestRepo.save(feedbackRequestDB())).thenReturn(feedbackRequestDB());
+        when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers());
+        when(feedbackRepo.saveAll(feedbackList())).thenReturn(feedbackList());
+        when(feedbackRequestRepo.save(feedbackRequestDBActive())).thenReturn(feedbackRequestDBActive());
         FeedbackRequestDto feedbackRequestDto =
-                feedbackRequestServiceImpl.updateFeedbackRequestActivation(1L, 1L,
-                        SwitcherDto.builder().isActive(false).build());
+                feedbackRequestServiceImpl.activateFeedbackRequest(1L, 1L,
+                        SwitcherDto.builder().isActive(true).build());
         assertNotNull(feedbackRequestDto);
-        assertEquals(feedbackRequestDto.getId(), feedbackRequestDB().getId());
-        assertEquals(feedbackRequestDto.getCourseId(), feedbackRequestDB().getId());
-        assertEquals(feedbackRequestDto.getCourseTitle(), feedbackRequestDB().getCourse().getTitle());
-        assertEquals(feedbackRequestDto.getStartDate(), feedbackRequestDB().getStartDate());
-        assertEquals(feedbackRequestDto.getEndDate(), feedbackRequestDB().getEndDate());
+        assertEquals(feedbackRequestDto, map(feedbackRequestDBActive()));
         verify(courseRepo).findById(1L);
         verify(feedbackRequestRepo).findById(1L);
-        verify(feedbackRequestRepo).save(feedbackRequestDB());
+        verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
+        verify(feedbackRepo).saveAll(feedbackList());
+        verify(feedbackRequestRepo).save(feedbackRequestDBActive());
     }
 
     private Set<User> setOfUsers() {
@@ -128,7 +131,6 @@ class FeedbackRequestServiceImplTest {
                         .email("first@mail.com")
                         .role(Role.USER)
                         .password("12345")
-                        .feedbackRequests(new HashSet<>())
                         .build(),
                 User.builder()
                         .id(2L)
@@ -137,7 +139,6 @@ class FeedbackRequestServiceImplTest {
                         .email("second@mail.com")
                         .role(Role.USER)
                         .password("password")
-                        .feedbackRequests(new HashSet<>())
                         .build()
         );
     }
@@ -156,7 +157,6 @@ class FeedbackRequestServiceImplTest {
     private FeedbackRequest feedbackRequest() {
         return FeedbackRequest.builder()
                 .course(course())
-                .users(setOfUsers())
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(END_DATE))
                 .build();
@@ -168,19 +168,37 @@ class FeedbackRequestServiceImplTest {
         return feedbackRequest;
     }
 
-    private Feedback feedback(User user) {
-        return Feedback.builder()
-                .isClosed(false)
-                .feedbackRequestId(feedbackRequestDB().getId())
-                .userId(user.getId())
-                .isClosed(false)
-                .answer(new HashSet<>())
+    private FeedbackRequest feedbackRequestDBActive() {
+        FeedbackRequest feedbackRequest = feedbackRequestDB();
+        feedbackRequest.setActive(true);
+        return feedbackRequest;
+    }
+
+    private FeedbackAnswers feedbackAnswers() {
+        return FeedbackAnswers.builder()
+                .feedbackRequestId(1L)
+                .answers(new LinkedHashSet<>())
                 .build();
     }
 
-    private Feedback feedbackDB(User user) {
-        Feedback feedback = feedback(user);
-        feedback.setId("someId");
-        return feedback;
+    private FeedbackAnswers feedbackAnswersDB() {
+        FeedbackAnswers feedbackAnswers = feedbackAnswers();
+        feedbackAnswers.setId("700cd3b5cbeda2185b994b0b");
+        return feedbackAnswers;
     }
+
+    private List<Feedback> feedbackList() {
+        Set<User> userSet = setOfUsers();
+        List<Feedback> feedbackList = new ArrayList<>();
+        userSet.forEach(user -> {
+            feedbackList.add(Feedback.builder()
+                    .isActive(true)
+                    .feedbackRequestId(1L)
+                    .userId(user.getId())
+                    .answers(feedbackAnswersDB().getAnswers())
+                    .build());
+        });
+        return feedbackList;
+    }
+
 }

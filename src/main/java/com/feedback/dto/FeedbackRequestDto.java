@@ -15,6 +15,7 @@ public class FeedbackRequestDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean isActive;
+    private boolean isFinished;
     private String courseTitle;
     private Long courseId;
 
@@ -24,6 +25,7 @@ public class FeedbackRequestDto {
                 .startDate(feedbackRequest.getStartDate())
                 .endDate(feedbackRequest.getEndDate())
                 .isActive(feedbackRequest.isActive())
+                .isFinished(feedbackRequest.isFinished())
                 .courseTitle(feedbackRequest.getCourse().getTitle())
                 .courseId(feedbackRequest.getCourse().getId())
                 .build();

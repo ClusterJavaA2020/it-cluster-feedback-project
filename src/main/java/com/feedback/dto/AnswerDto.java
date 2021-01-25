@@ -8,6 +8,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class AnswerDto {
+    private Long questionId;
     private String question;
     private UserDto teacher;
     private Integer rate;

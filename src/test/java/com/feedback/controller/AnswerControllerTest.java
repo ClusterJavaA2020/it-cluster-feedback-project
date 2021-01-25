@@ -1,9 +1,11 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.UserDto;
 import com.feedback.model.Answer;
 import com.feedback.service.AnswerService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,13 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Set;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,18 +42,23 @@ class AnswerControllerTest {
         openMocks(this);
     }
 
+    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(answerService);
+    }
+
     @WithMockUser
     @Test
     void testCreateAnswer() throws Exception {
-        when(answerService.createAnswer(1L, 1L, 1L, 1L)).thenReturn(answer());
+        when(answerService.createAnswer(2L, 105L, answer())).thenReturn(answer());
         MvcResult mvcResult = mockMvc
                 .perform(post("/courses/2/feedback-requests/105/answers")
-                        .param("questionId", "1")
-                        .param("teacherId", "2")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(answer())))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(answerService).createAnswer(2L, 105L, answer());
     }
 
     @WithMockUser
@@ -61,6 +71,21 @@ class AnswerControllerTest {
                 .andExpect(status()
                         .isOk())
                 .andReturn();
+        verify(answerService).getAnswersByFeedbackRequestId(2L, 105L);
+    }
+
+    @WithMockUser
+    @Test
+    void testDeleteAnswer() throws Exception {
+        when(answerService.deleteAnswer(2L, 105L, answer())).thenReturn(Set.of(answer()));
+        MvcResult mvcResult = mockMvc
+                .perform(delete("/courses/2/feedback-requests/105/answers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(answer())))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(answerService).deleteAnswer(2L, 105L, answer());
     }
 
     private Answer answer() {
@@ -75,9 +100,10 @@ class AnswerControllerTest {
     private AnswerDto answerDto() {
         return AnswerDto.builder()
                 .comment("comment")
+                .questionId(3L)
                 .question("question")
-                .rate(4)
-                .teacher(UserDto.builder().build())
+                .rate(5)
+                .teacher(UserDto.builder().id(4L).build())
                 .build();
     }
 }

@@ -10,6 +10,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
+import static com.feedback.dto.QuestionDto.map;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -66,19 +67,28 @@ class QuestionServiceImplTest {
         verify(questionRepo).findById(2L);
     }
 
+    @Test
+    void addQuestion() {
+        when(questionRepo.findByQuestionValue("Some first custom question?")).thenReturn(questions().get(0));
+        when(questionRepo.save(questions().get(0))).thenReturn(questions().get(0));
+        Question question = questionService.addQuestion(map(questions().get(0)));
+        assertEquals(questions().get(0), question);
+        verify(questionRepo).findByQuestionValue("Some first custom question?");
+        verify(questionRepo).save(questions().get(0));
+    }
+
     private List<Question> questions() {
         return List.of(Question.builder()
                         .id(1L)
-                        .isRateable(true)
                         .isPattern(false)
-                        .questionValue("Some first question?")
+                        .questionValue("Some first custom question?")
                         .build(),
                 Question.builder()
                         .id(2L)
-                        .isRateable(false)
                         .isPattern(true)
-                        .questionValue("Some second question?")
+                        .questionValue("Some second custom question?")
                         .build()
         );
     }
+
 }

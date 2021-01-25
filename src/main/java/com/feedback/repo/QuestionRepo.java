@@ -9,4 +9,6 @@ public interface QuestionRepo extends JpaRepository<Question, Long> {
     List<Question> findByIsPatternTrue();
 
     List<Question> findByIsPatternFalse();
+
+    Question findByQuestionValue(String questionValue);
 }

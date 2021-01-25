@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,7 +34,6 @@ class FeedbackRequestRepoTest {
         feedbackRequestRepo.save(feedbackRequest);
         Optional<FeedbackRequest> byId = feedbackRequestRepo.findById(feedbackRequest.getId());
         assertTrue(byId.isPresent());
-        byId.get().setUsers(Set.of(user));
         byId.get().setCourse(testCourse);
         assertEquals(feedbackRequest, byId.get());
     }
@@ -51,7 +49,6 @@ class FeedbackRequestRepoTest {
     private FeedbackRequest feedbackRequest(User user, Course course) {
         return FeedbackRequest.builder()
                 .course(course)
-                .users(Set.of(user))
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(5))
                 .isActive(true)
@@ -75,6 +72,5 @@ class FeedbackRequestRepoTest {
                 .endDate(LocalDate.now().plusDays(10))
                 .build();
     }
-
 
 }
