@@ -31,6 +31,7 @@ import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -56,7 +57,7 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo, feedbackRepo);
     }
 
     @Test
@@ -120,6 +121,23 @@ class FeedbackRequestServiceImplTest {
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
         verify(feedbackRepo).saveAll(feedbackList());
         verify(feedbackRequestRepo).save(feedbackRequestDBActive());
+    }
+
+    @Test
+    void testDeleteFeedbackRequest() {
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
+        doNothing().when(feedbackRequestRepo).delete(feedbackRequestDB());
+        when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers());
+        when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackList());
+        doNothing().when(feedbackRepo).deleteAll(feedbackList());
+        doNothing().when(feedbackAnswersRepo).delete(feedbackAnswers());
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestServiceImpl.deleteFeedbackRequest(1L, 1L);
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRequestRepo).delete(feedbackRequestDB());
+        verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
+        verify(feedbackRepo).findByFeedbackRequestId(1L);
+        verify(feedbackRepo).deleteAll(feedbackList());
+        verify(feedbackAnswersRepo).delete(feedbackAnswers());
     }
 
     private Set<User> setOfUsers() {

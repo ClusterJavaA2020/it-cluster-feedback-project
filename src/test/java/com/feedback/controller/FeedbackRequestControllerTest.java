@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -103,6 +104,19 @@ class FeedbackRequestControllerTest {
                         .isOk())
                 .andReturn();
         verify(feedbackRequestService).activateFeedbackRequest(15L, 1L, switcherDto());
+    }
+
+    @WithMockUser
+    @Test
+    void testDeleteFeedbackRequest() throws Exception {
+        when(feedbackRequestService.deleteFeedbackRequest(15L, 1L)).thenReturn(feedbackRequestDto());
+        MvcResult mvcResult = mockMvc
+                .perform(delete("/courses/15/feedback-requests/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(feedbackRequestService).deleteFeedbackRequest(15L, 1L);
     }
 
     private Course course() {

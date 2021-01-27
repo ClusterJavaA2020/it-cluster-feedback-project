@@ -97,4 +97,23 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         }
         return null;
     }
+
+    @Override
+    public FeedbackRequestDto deleteFeedbackRequest(Long courseId, Long feedbackRequestId) {
+        FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
+        if (feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId)) {
+            feedbackRequestRepo.delete(feedbackRequest);
+            FeedbackAnswers feedbackAnswers = feedbackAnswersRepo.findByFeedbackRequestId(feedbackRequestId);
+            List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
+            if (!feedbackList.isEmpty()) {
+                feedbackRepo.deleteAll(feedbackList);
+            }
+            if (feedbackAnswers != null) {
+                feedbackAnswersRepo.delete(feedbackAnswers);
+            }
+            return map(feedbackRequest);
+        }
+        return null;
+    }
+
 }
