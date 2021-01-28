@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface FeedbackService {
     List<Feedback> getAll();
-    Feedback saveFeedback(Feedback feedback);
 
 }

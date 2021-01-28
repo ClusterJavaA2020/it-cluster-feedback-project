@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/feedback")
 public class FeedbackController {
-    FeedbackService feedbackService;
+    private final FeedbackService feedbackService;
     @Autowired
     public FeedbackController(FeedbackService feedbackService){
         this.feedbackService = feedbackService;
@@ -21,8 +21,5 @@ public class FeedbackController {
     public List<Feedback> getAll(){
         return feedbackService.getAll();
     }
-    @PostMapping
-    public Feedback saveFeedback(@RequestBody Feedback feedback){
-        return feedbackService.saveFeedback(feedback);
-    }
+
 }

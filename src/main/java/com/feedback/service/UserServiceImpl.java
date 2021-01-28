@@ -63,6 +63,16 @@ public class UserServiceImpl implements UserService{
         emailSenderService.sendEmail(simpleMailMessage);
     }
     @Override
+    public void sendQuestionnaire(Optional<User> user){
+        final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(user.get().getEmail());
+        simpleMailMessage.setSubject("form");
+        simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
+        //user page is in process
+        simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.get().getId());
+        emailSenderService.sendEmail(simpleMailMessage);
+    }
+    @Override
     public User findUserById(Long id){
         return userRepo.findById(id).orElseThrow(UserNotFoundException::new);
     }
