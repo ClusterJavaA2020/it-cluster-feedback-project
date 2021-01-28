@@ -2,6 +2,7 @@ package com.feedback.controller;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.repo.entity.User;
 import com.feedback.service.CourseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,5 +51,10 @@ public class CourseController {
     @GetMapping("{courseId}/students")
     public Set<UserDto> getCourseStudents(@PathVariable Long courseId) {
         return courseService.getCourseStudents(courseId);
+    }
+
+    @PostMapping("/addUser/{userId}/{courseId}")
+    public User courseAddUser(@PathVariable Long userId, @PathVariable Long courseId){
+        return courseService.courseAddUser(userId,courseId);
     }
 }

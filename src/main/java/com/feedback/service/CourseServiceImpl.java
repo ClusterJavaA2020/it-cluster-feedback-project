@@ -2,10 +2,15 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
+import com.feedback.exceptions.CourseCreateException;
 import com.feedback.repo.CourseRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
+import com.feedback.repo.entity.User;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,19 +19,25 @@ import static com.feedback.dto.CourseDto.map;
 @Service
 public class CourseServiceImpl implements CourseService {
     private final CourseRepo courseRepo;
+    private final UserRepo userRepo;
 
-    public CourseServiceImpl(CourseRepo courseRepo) {
+    public CourseServiceImpl(CourseRepo courseRepo, UserRepo userRepo) {
         this.courseRepo = courseRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
     public CourseDto create(CourseDto dto) {
-        return map(courseRepo.save(map(dto)));
+        try {
+            return map(courseRepo.save(map(dto)));
+        } catch (DataIntegrityViolationException e) {
+            throw new CourseCreateException();
+        }
     }
 
     @Override
     public CourseDto get(Long id) {
-        return map(courseRepo.getOne(id));
+        return courseRepo.findById(id).map(CourseDto::map).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override
@@ -64,5 +75,13 @@ public class CourseServiceImpl implements CourseService {
                 .filter(u -> u.getRole().equals(Role.USER))
                 .map(UserDto::map)
                 .collect(Collectors.toSet())).orElse(null);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('admin:create')")
+    public User courseAddUser(Long userId, Long courseId) {
+        User user = userRepo.findUserById(userId);
+        courseRepo.SaveInUserCourse(userId, courseId);
+        return user;
     }
 }
