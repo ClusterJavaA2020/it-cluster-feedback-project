@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService{
             throw new UserAlreadyExistException();
         }
 
-        User user = userRepo.saveAndFlush(UserDto.map(userDto,passwordEncoder.encode(userDto.getPassword())));
+        User user = userRepo.save(UserDto.map(userDto,passwordEncoder.encode(userDto.getPassword())));
         sendRegistrationEmail(user);
         return UserDto.map(user);
     }
