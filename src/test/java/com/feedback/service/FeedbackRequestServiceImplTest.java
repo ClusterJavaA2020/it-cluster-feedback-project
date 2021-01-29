@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ class FeedbackRequestServiceImplTest {
         when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackList());
         doNothing().when(feedbackRepo).deleteAll(feedbackList());
         doNothing().when(feedbackAnswersRepo).delete(feedbackAnswers());
-        FeedbackRequestDto feedbackRequestDto = feedbackRequestServiceImpl.deleteFeedbackRequest(1L, 1L);
+        ResponseEntity<String> feedbackRequestDto = feedbackRequestServiceImpl.deleteFeedbackRequest(1L, 1L);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackRequestRepo).delete(feedbackRequestDB());
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);

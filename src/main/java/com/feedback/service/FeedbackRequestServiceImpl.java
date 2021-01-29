@@ -11,6 +11,8 @@ import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
 import com.feedback.util.SwitcherDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -99,7 +101,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     }
 
     @Override
-    public FeedbackRequestDto deleteFeedbackRequest(Long courseId, Long feedbackRequestId) {
+    public ResponseEntity<String> deleteFeedbackRequest(Long courseId, Long feedbackRequestId) {
         FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
         if (feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId)) {
             feedbackRequestRepo.delete(feedbackRequest);
@@ -111,9 +113,9 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             if (feedbackAnswers != null) {
                 feedbackAnswersRepo.delete(feedbackAnswers);
             }
-            return map(feedbackRequest);
+            return new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT);
         }
-        return null;
+        return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
     }
 
 }

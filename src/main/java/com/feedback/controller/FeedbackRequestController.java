@@ -1,8 +1,9 @@
 package com.feedback.controller;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.util.SwitcherDto;
 import com.feedback.service.FeedbackRequestService;
+import com.feedback.util.SwitcherDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,8 +47,8 @@ public class FeedbackRequestController {
     }
 
     @DeleteMapping("{courseId}/feedback-requests/{feedbackRequestId}")
-    public FeedbackRequestDto deleteFeedbackRequest(@PathVariable Long courseId,
-                                                    @PathVariable Long feedbackRequestId) {
+    public ResponseEntity<String> deleteFeedbackRequest(@PathVariable Long courseId,
+                                                        @PathVariable Long feedbackRequestId) {
         return feedbackRequestService.deleteFeedbackRequest(courseId, feedbackRequestId);
     }
 }

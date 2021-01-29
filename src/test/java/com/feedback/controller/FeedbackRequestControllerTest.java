@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -109,12 +111,11 @@ class FeedbackRequestControllerTest {
     @WithMockUser
     @Test
     void testDeleteFeedbackRequest() throws Exception {
-        when(feedbackRequestService.deleteFeedbackRequest(15L, 1L)).thenReturn(feedbackRequestDto());
+        when(feedbackRequestService.deleteFeedbackRequest(15L, 1L))
+                .thenReturn(new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT));
         MvcResult mvcResult = mockMvc
-                .perform(delete("/courses/15/feedback-requests/1")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status()
-                        .isOk())
+                .perform(delete("/courses/15/feedback-requests/1"))
+                .andExpect(status().isNoContent())
                 .andReturn();
         verify(feedbackRequestService).deleteFeedbackRequest(15L, 1L);
     }

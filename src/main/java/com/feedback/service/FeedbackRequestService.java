@@ -2,6 +2,7 @@ package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
 import com.feedback.util.SwitcherDto;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface FeedbackRequestService {
 
     FeedbackRequestDto activateFeedbackRequest(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
 
-    FeedbackRequestDto deleteFeedbackRequest(Long courseId, Long feedbackRequestId);
+    ResponseEntity<String> deleteFeedbackRequest(Long courseId, Long feedbackRequestId);
 }
