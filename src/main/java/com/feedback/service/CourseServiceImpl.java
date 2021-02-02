@@ -3,6 +3,7 @@ package com.feedback.service;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,11 @@ import static com.feedback.dto.CourseDto.map;
 @Service
 public class CourseServiceImpl implements CourseService {
     private final CourseRepo courseRepo;
+    private final UserRepo userRepo;
 
-    public CourseServiceImpl(CourseRepo courseRepo) {
+    public CourseServiceImpl(CourseRepo courseRepo, UserRepo userRepo) {
         this.courseRepo = courseRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -65,4 +68,19 @@ public class CourseServiceImpl implements CourseService {
                 .map(UserDto::map)
                 .collect(Collectors.toSet())).orElse(null);
     }
+
+    @Override
+    public Set<UserDto> getStudentsNotFromCourse(Long courseId) {
+        return userRepo.findStudentNotFromCourse(courseId).stream()
+                .map(UserDto::map)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserDto> getTeachersNotFromCourse(Long courseId) {
+        return userRepo.findTeacherNotFromCourse(courseId).stream()
+                .map(UserDto::map)
+                .collect(Collectors.toSet());
+    }
+
 }
