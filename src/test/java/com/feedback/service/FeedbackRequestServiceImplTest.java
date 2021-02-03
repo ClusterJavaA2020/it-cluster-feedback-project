@@ -112,7 +112,7 @@ class FeedbackRequestServiceImplTest {
         when(feedbackRequestRepo.save(feedbackRequestDBActive())).thenReturn(feedbackRequestDBActive());
         FeedbackRequestDto feedbackRequestDto =
                 feedbackRequestServiceImpl.activateFeedbackRequest(1L, 1L,
-                        SwitcherDto.builder().isActive(true).build());
+                        SwitcherDto.builder().active(true).build());
         assertNotNull(feedbackRequestDto);
         assertEquals(feedbackRequestDto, map(feedbackRequestDBActive()));
         verify(courseRepo).findById(1L);

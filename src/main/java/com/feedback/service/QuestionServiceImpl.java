@@ -51,4 +51,10 @@ public class QuestionServiceImpl implements QuestionService {
         }
     }
 
+    @Override
+    public int isPattern(boolean isPattern, Long id) {
+        questionRepo.isPattern(isPattern, id);
+        return isPattern ? 1 : 0;
+    }
+
 }

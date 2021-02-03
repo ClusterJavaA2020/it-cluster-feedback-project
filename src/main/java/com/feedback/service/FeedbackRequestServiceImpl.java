@@ -12,19 +12,14 @@ import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
-import com.feedback.util.SwitcherDto;
 import com.feedback.repo.entity.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static com.feedback.dto.FeedbackRequestDto.map;
 
 @Service
@@ -111,17 +106,10 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     @Override
     @Scheduled(fixedDelay = 86400000)
     public void reminder(){
-        List<Long> usersIdWhoHaveFeedbackRequest = feedbackRequestRepo.userId();
-        List<Long> allUserIdWhoResponded = feedbackRepo.findAll().stream().map(Feedback::getUserId)
-                .collect(Collectors.toList());
-        usersIdWhoHaveFeedbackRequest.removeAll(allUserIdWhoResponded);
-        for (Long users : usersIdWhoHaveFeedbackRequest) {
-            Optional<User> user = userRepo.findById(users);
-            if (user.isPresent()){
-                userService.sendQuestionnaire(user);
-            }else {
-                System.out.println("problem");
-            }
-        }
+        feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
+                .stream().map(Feedback::getUserId).forEach(userId->{
+            Optional<User> user = userRepo.findById(userId);
+            user.ifPresent(userService::sendQuestionnaire);
+        });
     }
 }

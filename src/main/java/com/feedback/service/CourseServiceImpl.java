@@ -78,7 +78,6 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('admin:create')")
     public User courseAddUser(Long userId, Long courseId) {
         User user = userRepo.findUserById(userId);
         courseRepo.SaveInUserCourse(userId, courseId);
