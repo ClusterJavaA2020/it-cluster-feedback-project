@@ -19,4 +19,9 @@ public interface CourseService {
     Set<UserDto> getCourseTeachers(Long courseId);
 
     Set<UserDto> getCourseStudents(Long courseId);
+
+    Set<UserDto> getStudentsNotFromCourse(Long courseId);
+
+    Set<UserDto> getTeachersNotFromCourse(Long courseId);
+
 }
