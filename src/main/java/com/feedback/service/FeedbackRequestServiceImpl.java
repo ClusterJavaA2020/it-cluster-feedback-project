@@ -1,12 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.repo.CourseRepo;
-import com.feedback.repo.FeedbackAnswersRepo;
-import com.feedback.repo.FeedbackRepo;
-import com.feedback.repo.FeedbackRequestRepo;
-import com.feedback.repo.UserRepo;
-import com.feedback.util.SwitcherDto;
+import com.feedback.repo.*;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackAnswers;
@@ -14,6 +9,9 @@ import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
 import org.springframework.scheduling.annotation.Scheduled;
+import com.feedback.util.SwitcherDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -103,6 +101,25 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         }
         return null;
     }
+
+    @Override
+    public ResponseEntity<String> deleteFeedbackRequest(Long courseId, Long feedbackRequestId) {
+        FeedbackRequest feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId).orElse(null);
+        if (feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId)) {
+            feedbackRequestRepo.delete(feedbackRequest);
+            FeedbackAnswers feedbackAnswers = feedbackAnswersRepo.findByFeedbackRequestId(feedbackRequestId);
+            List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
+            if (!feedbackList.isEmpty()) {
+                feedbackRepo.deleteAll(feedbackList);
+            }
+            if (feedbackAnswers != null) {
+                feedbackAnswersRepo.delete(feedbackAnswers);
+            }
+            return new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     @Scheduled(fixedDelay = 86400000)
     public void reminder(){
