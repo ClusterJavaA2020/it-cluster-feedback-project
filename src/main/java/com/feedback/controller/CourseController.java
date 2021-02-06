@@ -57,4 +57,14 @@ public class CourseController {
     public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId){
         return courseService.courseAddUser(userId,courseId);
     }
+
+    @GetMapping("/{courseId}/not-students")
+    public Set<UserDto> getStudentsNotFromCourse(@PathVariable Long courseId) {
+        return courseService.getStudentsNotFromCourse(courseId);
+    }
+
+    @GetMapping("/{courseId}/not-teachers")
+    public Set<UserDto> getTeachersNotFromCourse(@PathVariable Long courseId) {
+        return courseService.getTeachersNotFromCourse(courseId);
+    }
 }

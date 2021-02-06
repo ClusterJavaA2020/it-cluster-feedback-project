@@ -2,7 +2,6 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
-import com.feedback.exceptions.CourseNotFoundException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
@@ -76,4 +75,19 @@ public class CourseServiceImpl implements CourseService {
         courseRepo.saveUserInCourse(userId, courseId);
         return UserDto.map(user);
     }
+
+    @Override
+    public Set<UserDto> getStudentsNotFromCourse(Long courseId) {
+        return userRepo.findStudentNotFromCourse(courseId).stream()
+                .map(UserDto::map)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserDto> getTeachersNotFromCourse(Long courseId) {
+        return userRepo.findTeacherNotFromCourse(courseId).stream()
+                .map(UserDto::map)
+                .collect(Collectors.toSet());
+    }
+
 }
