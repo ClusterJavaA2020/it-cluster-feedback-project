@@ -4,7 +4,11 @@ package com.feedback.controller;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 import java.util.List;
 
@@ -17,9 +21,9 @@ public class FeedbackController {
         this.feedbackService = feedbackService;
     }
 
-    @GetMapping
-    public List<Feedback> getAll(){
-        return feedbackService.getAll();
+    @GetMapping("/{id}")
+    public List<Feedback> getAllByFeedbackRequestId(@PathVariable int id) {
+        return feedbackService.getAllByFeedbackRequestId(id);
     }
 
 }

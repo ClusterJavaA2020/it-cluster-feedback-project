@@ -3,13 +3,10 @@ package com.feedback.service;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.exceptions.CourseNotFoundException;
-import com.feedback.exceptions.CourseCreateException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,11 +25,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto create(CourseDto dto) {
-        try {
             return map(courseRepo.save(map(dto)));
-        } catch (DataIntegrityViolationException e) {
-            throw new CourseCreateException();
-        }
     }
 
     @Override
@@ -78,9 +71,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public User courseAddUser(Long userId, Long courseId) {
+    public UserDto courseAddUser(Long userId, Long courseId) {
         User user = userRepo.findUserById(userId);
-        courseRepo.SaveInUserCourse(userId, courseId);
-        return user;
+        courseRepo.saveUserInCourse(userId, courseId);
+        return UserDto.map(user);
     }
 }

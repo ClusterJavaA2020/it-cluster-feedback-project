@@ -18,5 +18,5 @@ public interface QuestionRepo extends JpaRepository<Question, Long> {
     @Modifying
     @Query(value = "UPDATE questions SET is_pattern = :isPattern where id = :id",nativeQuery = true)
     @Transactional
-    int isPattern(boolean isPattern,Long id);
+    void togglePattern(boolean isPattern,Long id);
 }

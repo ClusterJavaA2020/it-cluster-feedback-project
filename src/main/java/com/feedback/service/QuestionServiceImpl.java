@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.QuestionDto;
+import com.feedback.exceptions.QuestionNotFoundException;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
@@ -52,9 +53,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public int isPattern(boolean isPattern, Long id) {
-        questionRepo.isPattern(isPattern, id);
-        return isPattern ? 1 : 0;
+    public Question togglePattern(boolean isPattern, Long id) {
+        questionRepo.togglePattern(isPattern, id);
+        return questionRepo.findById(id).orElseThrow(QuestionNotFoundException::new);
     }
-
 }

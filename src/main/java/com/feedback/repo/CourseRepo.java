@@ -10,5 +10,5 @@ public interface CourseRepo extends JpaRepository<Course, Long> {
     @Modifying
     @Query(value = "INSERT INTO user_course (user_id,course_id) VALUE (:userId,:courseId)", nativeQuery = true)
     @Transactional
-    void SaveInUserCourse(Long userId,Long courseId);
+    void saveUserInCourse(Long userId,Long courseId);
 }

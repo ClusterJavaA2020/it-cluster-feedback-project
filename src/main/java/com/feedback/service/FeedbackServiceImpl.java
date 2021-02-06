@@ -13,14 +13,14 @@ import java.util.List;
 @Data
 @Service
 public class FeedbackServiceImpl implements FeedbackService {
-    FeedbackRepo repo;
+    private final FeedbackRepo repo;
     @Autowired
     public FeedbackServiceImpl(FeedbackRepo repo){
         this.repo = repo;
     }
 
     @Override
-    public List<Feedback> getAll(){
-        return repo.findAll();
+    public List<Feedback> getAllByFeedbackRequestId(int id){
+        return repo.findAllByFeedbackRequestId(id);
     }
 }

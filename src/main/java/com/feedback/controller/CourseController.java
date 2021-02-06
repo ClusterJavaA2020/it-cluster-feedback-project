@@ -2,7 +2,6 @@ package com.feedback.controller;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
-import com.feedback.repo.entity.User;
 import com.feedback.service.CourseService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Set;
 
 @RestController
@@ -56,7 +54,7 @@ public class CourseController {
 
     @PostMapping("/addUser/{userId}/{courseId}")
     @PreAuthorize("hasAuthority('admin:create')")
-    public User courseAddUser(@PathVariable Long userId, @PathVariable Long courseId){
+    public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId){
         return courseService.courseAddUser(userId,courseId);
     }
 }

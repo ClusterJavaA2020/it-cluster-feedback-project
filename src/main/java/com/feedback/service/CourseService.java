@@ -2,7 +2,6 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
-import com.feedback.repo.entity.User;
 
 import java.util.Set;
 
@@ -21,5 +20,5 @@ public interface CourseService {
 
     Set<UserDto> getCourseStudents(Long courseId);
 
-    User courseAddUser(Long courseId, Long userId);
+    UserDto courseAddUser(Long courseId, Long userId);
 }

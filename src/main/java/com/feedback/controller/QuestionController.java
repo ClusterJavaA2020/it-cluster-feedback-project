@@ -45,7 +45,7 @@ public class QuestionController {
         return questionService.addQuestion(questionDto);
     }
     @PostMapping("/{id}/pattern")
-    public int isPattern(@RequestBody SwitcherDto switcherDto, @PathVariable Long id){
-        return questionService.isPattern(switcherDto.isActive(),id);
+    public Question isPattern(@RequestBody SwitcherDto switcherDto, @PathVariable Long id) {
+        return questionService.togglePattern(switcherDto.isActive(),id);
     }
 }

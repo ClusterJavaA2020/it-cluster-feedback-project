@@ -1,7 +1,11 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
-import com.feedback.repo.*;
+import com.feedback.repo.CourseRepo;
+import com.feedback.repo.FeedbackAnswersRepo;
+import com.feedback.repo.FeedbackRepo;
+import com.feedback.repo.FeedbackRequestRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackAnswers;
@@ -29,6 +33,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final FeedbackRepo feedbackRepo;
     private final UserService userService;
     private final UserRepo userRepo;
+    private static final int day = 86400000;
 
     public FeedbackRequestServiceImpl(UserService userService,UserRepo userRepo,FeedbackRequestRepo feedbackRequestRepo,
                                     CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
@@ -121,7 +126,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     }
 
     @Override
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(fixedDelay = day)
     public void reminder(){
         feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
                 .stream().map(Feedback::getUserId).forEach(userId->{
