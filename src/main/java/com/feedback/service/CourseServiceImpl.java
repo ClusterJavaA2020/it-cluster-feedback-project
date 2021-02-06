@@ -2,6 +2,7 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
