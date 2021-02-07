@@ -17,7 +17,7 @@ import java.util.List;
 public class FeedbackController {
     private final FeedbackService feedbackService;
     @Autowired
-    public FeedbackController(FeedbackService feedbackService){
+    public FeedbackController(FeedbackService feedbackService) {
         this.feedbackService = feedbackService;
     }
 

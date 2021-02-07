@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService{
         emailSenderService.sendEmail(simpleMailMessage);
     }
     @Override
-    public void sendQuestionnaire(User user){
+    public void sendQuestionnaire(User user) {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setTo(user.getEmail());
             simpleMailMessage.setSubject("form");

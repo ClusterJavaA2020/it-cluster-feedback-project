@@ -54,7 +54,7 @@ public class CourseController {
 
     @PostMapping("/addUser/{userId}/{courseId}")
     @PreAuthorize("hasAuthority('admin:create')")
-    public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId){
+    public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId) {
         return courseService.courseAddUser(userId,courseId);
     }
 

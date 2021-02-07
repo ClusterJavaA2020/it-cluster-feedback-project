@@ -7,6 +7,7 @@ import com.feedback.repo.entity.Question;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.feedback.dto.QuestionDto.map;
 
@@ -53,8 +54,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question togglePattern(boolean isPattern, Long id) {
+    public boolean togglePattern(boolean isPattern, Long id) {
         questionRepo.togglePattern(isPattern, id);
-        return questionRepo.findById(id).orElseThrow(QuestionNotFoundException::new);
+        Question question = questionRepo.findById(id).orElseThrow(QuestionNotFoundException::new);
+        return question.isPattern();
     }
 }
