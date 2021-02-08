@@ -15,6 +15,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT * FROM users u WHERE u.id=?1 AND u.role=1", nativeQuery = true)
     Optional<User> findTeacherById(Long id);
+    User findUserById(Long id);
 
     @Query(value = "SELECT * FROM users u LEFT JOIN user_course uc ON u.id=uc.user_id WHERE u.id NOT IN (SELECT user_id FROM user_course WHERE course_id=?1) AND u.role=2" , nativeQuery = true)
     Set<User> findStudentNotFromCourse(Long id);

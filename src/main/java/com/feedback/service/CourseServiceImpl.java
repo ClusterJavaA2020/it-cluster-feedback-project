@@ -2,11 +2,12 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Role;
+import com.feedback.repo.entity.User;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,12 +25,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto create(CourseDto dto) {
-        return map(courseRepo.save(map(dto)));
+            return map(courseRepo.save(map(dto)));
     }
 
     @Override
     public CourseDto get(Long id) {
-        return map(courseRepo.getOne(id));
+        return courseRepo.findById(id).map(CourseDto::map).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override
@@ -67,6 +68,13 @@ public class CourseServiceImpl implements CourseService {
                 .filter(u -> u.getRole().equals(Role.USER))
                 .map(UserDto::map)
                 .collect(Collectors.toSet())).orElse(null);
+    }
+
+    @Override
+    public UserDto courseAddUser(Long userId, Long courseId) {
+        User user = userRepo.findUserById(userId);
+        courseRepo.saveUserInCourse(userId, courseId);
+        return UserDto.map(user);
     }
 
     @Override

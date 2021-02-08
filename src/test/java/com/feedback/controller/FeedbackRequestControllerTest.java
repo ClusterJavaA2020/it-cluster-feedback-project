@@ -145,7 +145,7 @@ class FeedbackRequestControllerTest {
 
     private SwitcherDto switcherDto() {
         return SwitcherDto.builder()
-                .isActive(true)
+                .active(true)
                 .build();
     }
 }

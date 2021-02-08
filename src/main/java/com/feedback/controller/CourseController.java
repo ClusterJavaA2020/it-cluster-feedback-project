@@ -3,6 +3,7 @@ package com.feedback.controller;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.service.CourseService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Set;
 
 @RestController
@@ -50,6 +50,12 @@ public class CourseController {
     @GetMapping("{courseId}/students")
     public Set<UserDto> getCourseStudents(@PathVariable Long courseId) {
         return courseService.getCourseStudents(courseId);
+    }
+
+    @PostMapping("/addUser/{userId}/{courseId}")
+    @PreAuthorize("hasAuthority('admin:create')")
+    public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId) {
+        return courseService.courseAddUser(userId,courseId);
     }
 
     @GetMapping("/{courseId}/not-students")
