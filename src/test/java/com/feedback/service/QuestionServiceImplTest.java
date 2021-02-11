@@ -45,18 +45,18 @@ class QuestionServiceImplTest {
 
     @Test
     void testGetPatterns() {
-        when(questionRepo.findByIsPatternTrue()).thenReturn(List.of(questions().get(1)));
+        when(questionRepo.findByPatternTrue()).thenReturn(List.of(questions().get(1)));
         List<Question> questionList = questionService.getPatterns();
         assertEquals(List.of(questions().get(1)), questionList);
-        verify(questionRepo).findByIsPatternTrue();
+        verify(questionRepo).findByPatternTrue();
     }
 
     @Test
     void testGetNonPatterns() {
-        when(questionRepo.findByIsPatternFalse()).thenReturn(List.of(questions().get(0)));
+        when(questionRepo.findByPatternFalse()).thenReturn(List.of(questions().get(0)));
         List<Question> questionList = questionService.getNonPatterns();
         assertEquals(List.of(questions().get(0)), questionList);
-        verify(questionRepo).findByIsPatternFalse();
+        verify(questionRepo).findByPatternFalse();
     }
 
     @Test
@@ -80,12 +80,12 @@ class QuestionServiceImplTest {
     private List<Question> questions() {
         return List.of(Question.builder()
                         .id(1L)
-                        .isPattern(false)
+                        .pattern(false)
                         .questionValue("Some first custom question?")
                         .build(),
                 Question.builder()
                         .id(2L)
-                        .isPattern(true)
+                        .pattern(true)
                         .questionValue("Some second custom question?")
                         .build()
         );

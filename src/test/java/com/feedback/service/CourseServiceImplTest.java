@@ -65,11 +65,11 @@ class CourseServiceImplTest {
 
     @Test
     void testGetAll() {
-        when(courseRepo.findAll()).thenReturn(List.of(course()));
-        Set<CourseDto> courseDtoSet = courseService.getAll();
+        when(courseRepo.findByOrderByStartDateDesc()).thenReturn(List.of(course()));
+        List<CourseDto> courseDtoSet = courseService.getAll();
         assertNotNull(courseDtoSet);
-        assertEquals(Set.of(map(course())), courseDtoSet);
-        verify(courseRepo).findAll();
+        assertEquals(List.of(map(course())), courseDtoSet);
+        verify(courseRepo).findByOrderByStartDateDesc();
     }
 
     @Test

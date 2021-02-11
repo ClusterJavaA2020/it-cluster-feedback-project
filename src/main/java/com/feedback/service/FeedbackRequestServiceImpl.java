@@ -16,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 
@@ -64,7 +66,8 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
 
     @Override
     public List<FeedbackRequestDto> getFeedbackRequestList(Long courseId) {
-        return feedbackRequestRepo.findByCourseId(courseId);
+        return feedbackRequestRepo.findByCourseIdOrderByIdDesc(courseId)
+                .stream().map(FeedbackRequestDto::map).collect(Collectors.toList());
     }
 
     @Override
@@ -87,14 +90,27 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             course.get().getUsers().stream().filter(user -> user.getRole().equals(Role.USER)).forEach(user -> feedbackList.add(
                     Feedback.builder()
                             .userId(user.getId())
+                            .courseId(courseId)
                             .feedbackRequestId(feedbackRequest.map(FeedbackRequest::getId).orElse(null))
-                            .isActive(true)
+                            .date(LocalDateTime.now())
                             .answers(feedbackAnswers.map(FeedbackAnswers::getAnswers).orElse(new LinkedHashSet<>()))
                             .build()
                     )
             );
             feedbackRepo.saveAll(feedbackList);
             feedbackRequest.get().setActive(true);
+            return map(feedbackRequestRepo.save(feedbackRequest.get()));
+        }
+        return null;
+    }
+
+    @Override
+    public FeedbackRequestDto finishFeedbackRequestSwitcher(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId);
+        if (course.isPresent() && feedbackRequest.isPresent() && feedbackRequest.get().isActive() &&
+                feedbackRequest.get().getCourse().getId().equals(courseId)) {
+            feedbackRequest.get().setFinished(switcherDto.isActive());
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;

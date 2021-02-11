@@ -24,12 +24,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<Question> getPatterns() {
-        return questionRepo.findByIsPatternTrue();
+        return questionRepo.findByPatternTrue();
     }
 
     @Override
     public List<Question> getNonPatterns() {
-        return questionRepo.findByIsPatternFalse();
+        return questionRepo.findByPatternFalse();
     }
 
     @Override

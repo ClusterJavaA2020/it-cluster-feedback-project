@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FeedbackRepo extends MongoRepository<Feedback, String> {
-    Optional<Feedback> findById(String feedbackRequestId);
+    Optional<Feedback> findById(String feedbackId);
 
     List<Feedback> findByFeedbackRequestId(Long feedbackRequestId);
+
+    List<Feedback> findByUserIdAndCourseId(Long userId, Long courseId);
+
+    List<Feedback> findByCourseIdAndFeedbackRequestIdAndSubmittedTrue(Long courseId, Long feedbackRequestId);
 }

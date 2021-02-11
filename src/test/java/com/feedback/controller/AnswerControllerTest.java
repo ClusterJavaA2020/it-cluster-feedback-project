@@ -2,7 +2,7 @@ package com.feedback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.AnswerDto;
-import com.feedback.dto.UserDto;
+import com.feedback.dto.BriefUserDto;
 import com.feedback.model.Answer;
 import com.feedback.service.AnswerService;
 import org.junit.jupiter.api.AfterEach;
@@ -103,7 +103,7 @@ class AnswerControllerTest {
                 .questionId(3L)
                 .question("question")
                 .rate(5)
-                .teacher(UserDto.builder().id(4L).build())
+                .teacher(BriefUserDto.builder().id(4L).build())
                 .build();
     }
 }

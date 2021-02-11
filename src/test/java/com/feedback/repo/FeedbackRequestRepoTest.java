@@ -1,6 +1,5 @@
 package com.feedback.repo;
 
-import com.feedback.dto.FeedbackRequestDto;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
@@ -40,7 +39,7 @@ class FeedbackRequestRepoTest {
 
     @Test
     void testFindByCourseId() {
-        List<FeedbackRequestDto> feedbackRequestList = feedbackRequestRepo.findByCourseId(1L);
+        List<FeedbackRequest> feedbackRequestList = feedbackRequestRepo.findByCourseIdOrderByIdDesc(1L);
         assertEquals(feedbackRequest(user(), course()).isActive(), feedbackRequestList.get(0).isActive());
         assertEquals(feedbackRequest(user(), course()).getStartDate(), feedbackRequestList.get(0).getStartDate());
         assertEquals(feedbackRequest(user(), course()).getEndDate(), feedbackRequestList.get(0).getEndDate());
@@ -51,7 +50,7 @@ class FeedbackRequestRepoTest {
                 .course(course)
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(5))
-                .isActive(true)
+                .active(true)
                 .build();
     }
 

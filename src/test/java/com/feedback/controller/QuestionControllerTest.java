@@ -118,12 +118,12 @@ class QuestionControllerTest {
         Question question1 = Question.builder()
                 .id(1L)
                 .questionValue("Test question 1")
-                .isPattern(true)
+                .pattern(true)
                 .build();
         Question question2 = Question.builder()
                 .id(2L)
                 .questionValue("Test question 2")
-                .isPattern(false)
+                .pattern(false)
                 .build();
 
         return List.of(question1, question2);

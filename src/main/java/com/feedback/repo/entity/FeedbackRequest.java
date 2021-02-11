@@ -34,8 +34,8 @@ public class FeedbackRequest {
     private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean isActive;
-    private boolean isFinished;
+    private boolean active;
+    private boolean finished;
 
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

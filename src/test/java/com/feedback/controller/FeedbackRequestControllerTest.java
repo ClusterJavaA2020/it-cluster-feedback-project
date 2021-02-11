@@ -120,6 +120,21 @@ class FeedbackRequestControllerTest {
         verify(feedbackRequestService).deleteFeedbackRequest(15L, 1L);
     }
 
+    @WithMockUser
+    @Test
+    void finishFeedbackRequest() throws Exception {
+        when(feedbackRequestService.finishFeedbackRequestSwitcher(15L, 1L, switcherDto()))
+                .thenReturn(feedbackRequestDto());
+        MvcResult mvcResult = mockMvc
+                .perform(put("/courses/15/feedback-requests/1/finish")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(switcherDto())))
+                .andExpect(status().isOk())
+                .andReturn();
+        verify(feedbackRequestService).finishFeedbackRequestSwitcher(15L, 1L, switcherDto());
+
+    }
+
     private Course course() {
         return Course.builder()
                 .id(15L)
@@ -145,7 +160,7 @@ class FeedbackRequestControllerTest {
 
     private SwitcherDto switcherDto() {
         return SwitcherDto.builder()
-                .isActive(true)
+                .active(true)
                 .build();
     }
 }

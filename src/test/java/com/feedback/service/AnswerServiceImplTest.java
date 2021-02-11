@@ -118,7 +118,7 @@ class AnswerServiceImplTest {
     private Question question() {
         return Question.builder()
                 .id(10L)
-                .isPattern(true)
+                .pattern(true)
                 .questionValue("First question")
                 .build();
     }

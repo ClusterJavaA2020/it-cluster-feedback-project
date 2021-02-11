@@ -23,7 +23,7 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private boolean isPattern = false;
+    private boolean pattern = false;
     @Column(nullable = false, unique = true)
     private String questionValue;
 }

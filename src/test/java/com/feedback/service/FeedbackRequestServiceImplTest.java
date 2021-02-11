@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Set;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
+import static java.time.LocalDateTime.now;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,7 +60,7 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo, feedbackRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo);
     }
 
     @Test
@@ -82,7 +84,7 @@ class FeedbackRequestServiceImplTest {
 
     @Test
     void testGetFeedbackRequestList() {
-        when(feedbackRequestRepo.findByCourseId(1L)).thenReturn(List.of(map(feedbackRequest())));
+        when(feedbackRequestRepo.findByCourseIdOrderByIdDesc(1L)).thenReturn(List.of(feedbackRequest()));
         List<FeedbackRequestDto> feedbackRequestDto = feedbackRequestServiceImpl.getFeedbackRequestList(1L);
         feedbackRequestDto.forEach(f -> {
             assertEquals(f.getStartDate(), feedbackRequest().getStartDate());
@@ -90,7 +92,7 @@ class FeedbackRequestServiceImplTest {
             assertEquals(f.getCourseTitle(), feedbackRequest().getCourse().getTitle());
             assertEquals(f.getCourseId(), feedbackRequest().getCourse().getId());
         });
-        verify(feedbackRequestRepo).findByCourseId(1L);
+        verify(feedbackRequestRepo).findByCourseIdOrderByIdDesc(1L);
     }
 
     @Test
@@ -110,17 +112,15 @@ class FeedbackRequestServiceImplTest {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
         when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers());
-        when(feedbackRepo.saveAll(feedbackList())).thenReturn(feedbackList());
         when(feedbackRequestRepo.save(feedbackRequestDBActive())).thenReturn(feedbackRequestDBActive());
         FeedbackRequestDto feedbackRequestDto =
                 feedbackRequestServiceImpl.activateFeedbackRequest(1L, 1L,
-                        SwitcherDto.builder().isActive(true).build());
+                        SwitcherDto.builder().active(true).build());
         assertNotNull(feedbackRequestDto);
         assertEquals(feedbackRequestDto, map(feedbackRequestDBActive()));
         verify(courseRepo).findById(1L);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
-        verify(feedbackRepo).saveAll(feedbackList());
         verify(feedbackRequestRepo).save(feedbackRequestDBActive());
     }
 
@@ -211,13 +211,18 @@ class FeedbackRequestServiceImplTest {
         List<Feedback> feedbackList = new ArrayList<>();
         userSet.forEach(user -> {
             feedbackList.add(Feedback.builder()
-                    .isActive(true)
+                    .submitted(false)
+                    .courseId(1L)
                     .feedbackRequestId(1L)
                     .userId(user.getId())
                     .answers(feedbackAnswersDB().getAnswers())
                     .build());
         });
         return feedbackList;
+    }
+
+    private LocalDateTime time() {
+        return now();
     }
 
 }

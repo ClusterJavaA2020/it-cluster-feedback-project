@@ -18,7 +18,7 @@ class QuestionRepoTest {
     void testFindByIsPatternTrue() {
         Question question = questionList().get(1);
         Question save = questionRepo.save(question);
-        List<Question> result = questionRepo.findByIsPatternTrue();
+        List<Question> result = questionRepo.findByPatternTrue();
         assertFalse(result.isEmpty());
         assertEquals(save, result.get(0));
     }
@@ -28,7 +28,7 @@ class QuestionRepoTest {
         Question question = questionList().get(0);
         question.setQuestionValue("testFindByIsPatternFalse");
         Question save = questionRepo.save(question);
-        List<Question> result = questionRepo.findByIsPatternFalse();
+        List<Question> result = questionRepo.findByPatternFalse();
         assertFalse(result.isEmpty());
         assertEquals(save, question);
     }
@@ -43,11 +43,11 @@ class QuestionRepoTest {
 
     private List<Question> questionList() {
         return List.of(Question.builder()
-                        .isPattern(false)
+                        .pattern(false)
                         .questionValue("Some first question?")
                         .build(),
                 Question.builder()
-                        .isPattern(true)
+                        .pattern(true)
                         .questionValue("Some second question?")
                         .build()
         );

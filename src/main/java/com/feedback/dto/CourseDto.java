@@ -14,7 +14,7 @@ public class CourseDto {
     private Long id;
     private String title;
     private String description;
-    private boolean isActive;
+    private boolean active;
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -23,7 +23,7 @@ public class CourseDto {
                 .id(course.getId())
                 .title(course.getTitle())
                 .description(course.getDescription())
-                .isActive(course.isActive())
+                .active(course.isActive())
                 .startDate(course.getStartDate())
                 .endDate(course.getEndDate())
                 .build();
@@ -34,7 +34,7 @@ public class CourseDto {
                 .id(course.getId())
                 .title(course.getTitle())
                 .description(course.getDescription())
-                .isActive(course.isActive())
+                .active(course.isActive())
                 .startDate(course.getStartDate())
                 .endDate(course.getEndDate())
                 .build();
