@@ -5,14 +5,17 @@ import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
+import com.feedback.repo.entity.User;
 import com.feedback.util.SwitcherDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,13 +35,19 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final CourseRepo courseRepo;
     private final FeedbackAnswersRepo feedbackAnswersRepo;
     private final FeedbackRepo feedbackRepo;
+    private final UserService userService;
+    private final UserRepo userRepo;
+    private static final int day = 86400000;
 
-    public FeedbackRequestServiceImpl(FeedbackRequestRepo feedbackRequestRepo, CourseRepo courseRepo,
-                                      FeedbackAnswersRepo feedbackAnswersRepo, FeedbackRepo feedbackRepo) {
+    public FeedbackRequestServiceImpl(UserService userService, UserRepo userRepo, FeedbackRequestRepo feedbackRequestRepo,
+                                      CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
+                                      FeedbackRepo feedbackRepo) {
         this.feedbackRequestRepo = feedbackRequestRepo;
         this.courseRepo = courseRepo;
         this.feedbackAnswersRepo = feedbackAnswersRepo;
         this.feedbackRepo = feedbackRepo;
+        this.userService = userService;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -134,4 +143,13 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
     }
 
+    @Override
+    @Scheduled(fixedDelay = day)
+    public void reminder() {
+        feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
+                .stream().map(Feedback::getUserId).forEach(userId -> {
+            Optional<User> user = userRepo.findById(userId);
+            user.ifPresent(userService::sendQuestionnaire);
+        });
+    }
 }

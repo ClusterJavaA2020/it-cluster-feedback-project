@@ -31,4 +31,7 @@ public interface CourseService {
     UserDto addStudentToCourseById(Long courseId, UserDto student);
 
     ResponseEntity<String> deleteUserFromCourse(Long courseId, UserDto userDto);
+
+    UserDto courseAddUser(Long courseId, Long userId);
+
 }

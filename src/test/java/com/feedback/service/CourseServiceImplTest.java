@@ -56,11 +56,11 @@ class CourseServiceImplTest {
 
     @Test
     void testGet() {
-        when(courseRepo.getOne(1L)).thenReturn(course());
+        when(courseRepo.findById(1L)).thenReturn(Optional.ofNullable(course()));
         CourseDto result = courseService.get(1L);
         assertNotNull(result);
         assertEquals(map(course()), result);
-        verify(courseRepo).getOne(1L);
+        verify(courseRepo).findById(1L);
     }
 
     @Test

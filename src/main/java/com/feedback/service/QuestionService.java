@@ -16,4 +16,5 @@ public interface QuestionService {
 
     Question addQuestion(QuestionDto questionDto);
 
+    boolean togglePattern(boolean switcherDto, Long id);
 }

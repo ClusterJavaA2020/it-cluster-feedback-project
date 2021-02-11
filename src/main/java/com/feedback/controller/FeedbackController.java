@@ -3,6 +3,7 @@ package com.feedback.controller;
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
+import com.feedback.repo.entity.Feedback;
 import com.feedback.service.FeedbackService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,4 +44,8 @@ public class FeedbackController {
         return feedbackService.updateFeedbackAnswers(courseId, feedbackRequestId, feedbackId, answerDtoList);
     }
 
+    @GetMapping("/feedback/{id}")
+    public List<Feedback> getAllByFeedbackRequestId(@PathVariable int id) {
+        return feedbackService.getAllByFeedbackRequestId(id);
+    }
 }

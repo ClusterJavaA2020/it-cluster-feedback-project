@@ -21,4 +21,6 @@ public interface UserService {
     Set<CourseDto> getUserCoursesByUserId(Long userId);
 
     List<FeedbackDto> getFeedbackByUserIdAndCourseId(Long userId, Long courseId);
+
+    void sendQuestionnaire(User user);
 }

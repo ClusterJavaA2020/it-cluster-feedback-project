@@ -103,7 +103,6 @@ public class UserServiceImpl implements UserService {
 
     public void confirmEmail(String id) {
         Hashids hashids = new Hashids(SECRET_WORD);
-
         User user = userRepo.findById(Long.parseLong(hashids.decodeHex(id))).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
         userRepo.save(user);
@@ -120,4 +119,15 @@ public class UserServiceImpl implements UserService {
         simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
     }
+    @Override
+    public void sendQuestionnaire(User user) {
+        final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setTo(user.getEmail());
+            simpleMailMessage.setSubject("form");
+            simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
+            //user page is in process
+            simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
+            emailSenderService.sendEmail(simpleMailMessage);
+    }
+
 }

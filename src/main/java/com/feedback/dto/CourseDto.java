@@ -4,7 +4,9 @@ import com.feedback.repo.entity.Course;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Data
@@ -12,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CourseDto {
     private Long id;
+    @NotBlank(message = "title is mandatory")
     private String title;
     private String description;
     private boolean active;

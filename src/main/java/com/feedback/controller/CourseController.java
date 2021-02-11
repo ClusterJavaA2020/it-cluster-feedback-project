@@ -5,6 +5,7 @@ import com.feedback.dto.UserDto;
 import com.feedback.service.CourseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,12 @@ public class CourseController {
     @DeleteMapping("/{courseId}/delete-user")
     public ResponseEntity<String> deleteUserFromCourse(@PathVariable Long courseId, @RequestBody UserDto userDto) {
         return courseService.deleteUserFromCourse(courseId, userDto);
+    }
+
+    @PostMapping("/addUser/{userId}/{courseId}")
+    @PreAuthorize("hasAuthority('admin:create')")
+    public UserDto courseAddUser(@PathVariable Long userId, @PathVariable Long courseId) {
+        return courseService.courseAddUser(userId,courseId);
     }
 
 }

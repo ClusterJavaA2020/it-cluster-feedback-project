@@ -96,4 +96,9 @@ public class FeedbackServiceImpl implements FeedbackService {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<Feedback> getAllByFeedbackRequestId(int id) {
+        return feedbackRepo.findAllByFeedbackRequestId(id);
+    }
+
 }

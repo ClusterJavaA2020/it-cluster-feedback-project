@@ -2,6 +2,7 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
@@ -34,12 +35,14 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto get(Long id) {
-        return map(courseRepo.getOne(id));
+        return courseRepo.findById(id).map(CourseDto::map).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override
     public List<CourseDto> getAll() {
-        return courseRepo.findByOrderByStartDateDesc().stream().map(CourseDto::map).collect(Collectors.toList());
+        return courseRepo.findByOrderByStartDateDesc().stream()
+                .map(CourseDto::map)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -117,6 +120,13 @@ public class CourseServiceImpl implements CourseService {
             return new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public UserDto courseAddUser(Long userId, Long courseId) {
+        User user = userRepo.findById(userId).orElse(null);
+        courseRepo.saveUserInCourse(userId, courseId);
+        return UserDto.map(user);
     }
 
 }
