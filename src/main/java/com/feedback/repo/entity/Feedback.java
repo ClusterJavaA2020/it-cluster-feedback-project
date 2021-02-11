@@ -25,6 +25,7 @@ public class Feedback {
     private Long courseId;
     private Long feedbackRequestId;
     private LocalDateTime date;
+    private boolean active;
     private boolean submitted;
     private Set<Answer> answers = new LinkedHashSet<>();
 }

@@ -22,6 +22,7 @@ public class FeedbackDto {
     private BriefUserDto user;
     private Long courseId;
     private BriefFeedbackRequestDto feedbackRequest;
+    private boolean active;
     private boolean submitted;
     private LocalDateTime date;
     private Set<AnswerDto> answers;
@@ -38,6 +39,7 @@ public class FeedbackDto {
                                 feedbackRequest.getId().equals(feedback.getFeedbackRequestId()))
                                 .map(BriefFeedbackRequestDto::map).findFirst().orElse(null))
                         .date(feedback.getDate())
+                        .active(feedback.isActive())
                         .submitted(feedback.isSubmitted())
                         .answers(feedback.getAnswers().stream()
                                 .map(answer -> AnswerDto.builder()

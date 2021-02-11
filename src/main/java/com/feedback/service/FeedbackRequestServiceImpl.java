@@ -102,12 +102,13 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
                             .courseId(courseId)
                             .feedbackRequestId(feedbackRequest.map(FeedbackRequest::getId).orElse(null))
                             .date(LocalDateTime.now())
+                            .active(true)
                             .answers(feedbackAnswers.map(FeedbackAnswers::getAnswers).orElse(new LinkedHashSet<>()))
                             .build()
                     )
             );
             feedbackRepo.saveAll(feedbackList);
-            feedbackRequest.get().setActive(true);
+            feedbackRequest.get().setActive(switcherDto.isActive());
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;
@@ -120,6 +121,9 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         if (course.isPresent() && feedbackRequest.isPresent() && feedbackRequest.get().isActive() &&
                 feedbackRequest.get().getCourse().getId().equals(courseId)) {
             feedbackRequest.get().setFinished(switcherDto.isActive());
+            List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
+            feedbackList.forEach(feedback -> feedback.setActive(!switcherDto.isActive()));
+            feedbackRepo.saveAll(feedbackList);
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;
@@ -146,7 +150,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     @Override
     @Scheduled(fixedDelay = day)
     public void reminder() {
-        feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
+        feedbackRepo.findByActiveTrueAndSubmittedFalse()
                 .stream().map(Feedback::getUserId).forEach(userId -> {
             Optional<User> user = userRepo.findById(userId);
             user.ifPresent(userService::sendQuestionnaire);

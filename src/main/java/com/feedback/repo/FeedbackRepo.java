@@ -15,7 +15,7 @@ public interface FeedbackRepo extends MongoRepository<Feedback, String> {
 
     List<Feedback> findByCourseIdAndFeedbackRequestIdAndSubmittedTrue(Long courseId, Long feedbackRequestId);
 
-    List<Feedback> findByIsActiveTrueAndIsSubmittedFalse();
+    List<Feedback> findByActiveTrueAndSubmittedFalse();
 
     List<Feedback> findAllByFeedbackRequestId(int id);
 
