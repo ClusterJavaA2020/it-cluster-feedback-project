@@ -13,6 +13,8 @@ import java.util.List;
 import static com.feedback.dto.QuestionDto.map;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -75,6 +77,16 @@ class QuestionServiceImplTest {
         assertEquals(questions().get(0), question);
         verify(questionRepo).findByQuestionValue("Some first custom question?");
         verify(questionRepo).save(questions().get(0));
+    }
+
+    @Test
+    void testTogglePattern() {
+        doNothing().when(questionRepo).togglePattern(true, 2L);
+        when(questionRepo.findById(2L)).thenReturn(java.util.Optional.ofNullable(questions().get(1)));
+        boolean result = questionService.togglePattern(true, 2L);
+        assertTrue(result);
+        verify(questionRepo).togglePattern(true, 2L);
+        verify(questionRepo).findById(2L);
     }
 
     private List<Question> questions() {

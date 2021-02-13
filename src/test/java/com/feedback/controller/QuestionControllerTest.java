@@ -3,6 +3,7 @@ package com.feedback.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.repo.entity.Question;
 import com.feedback.service.QuestionService;
+import com.feedback.util.SwitcherDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,6 +113,23 @@ class QuestionControllerTest {
                         .isOk())
                 .andReturn();
         verify(questionService).addQuestion(map(listOfQuestions().get(0)));
+    }
+
+    @WithMockUser
+    @Test
+    void isPattern() throws Exception {
+        when(questionService.togglePattern(true, 1L)).thenReturn(true);
+        MvcResult mvcResult = mockMvc
+                .perform(post("/questions/1/pattern")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(SwitcherDto.builder().active(true).build())
+                        )
+                )
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(questionService).togglePattern(true, 1L);
+
     }
 
     private List<Question> listOfQuestions() {

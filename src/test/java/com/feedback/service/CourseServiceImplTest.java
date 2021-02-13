@@ -3,6 +3,7 @@ package com.feedback.service;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
@@ -11,8 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +35,9 @@ class CourseServiceImplTest {
     @Mock
     private CourseRepo courseRepo;
 
+    @Mock
+    private UserRepo userRepo;
+
     @InjectMocks
     private CourseServiceImpl courseService;
 
@@ -41,7 +48,7 @@ class CourseServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(courseRepo);
+        verifyNoMoreInteractions(courseRepo, userRepo);
     }
 
     @Test
@@ -108,6 +115,63 @@ class CourseServiceImplTest {
         verify(courseRepo).findById(20L);
     }
 
+    @Test
+    void testGetStudentsNotFromCourse() {
+        when(userRepo.findStudentsNotFromCourse(37L))
+                .thenReturn(userList().stream().filter(user -> user.getRole().equals(Role.USER)).collect(Collectors.toSet()));
+        Set<UserDto> userDtoSet = courseService.getStudentsNotFromCourse(37L);
+        assertFalse(userDtoSet.isEmpty());
+        assertEquals(userList().stream()
+                .filter(user -> user.getRole().equals(Role.USER))
+                .map(UserDto::map).collect(Collectors.toSet()), userDtoSet);
+        verify(userRepo).findStudentsNotFromCourse(37L);
+    }
+
+    @Test
+    void testGetTeachersNotFromCourse() {
+        when(userRepo.findTeachersNotFromCourse(39L)).thenReturn(Set.of(teacher()));
+        Set<UserDto> userDtoSet = courseService.getTeachersNotFromCourse(39L);
+        assertFalse(userDtoSet.isEmpty());
+        assertEquals(userList().stream()
+                .filter(user -> user.getRole().equals(Role.TEACHER))
+                .map(UserDto::map).collect(Collectors.toSet()), userDtoSet);
+        verify(userRepo).findTeachersNotFromCourse(39L);
+    }
+
+    @Test
+    void testAddTeacherToCourseById() {
+        when(courseRepo.findById(54L)).thenReturn(Optional.ofNullable(course()));
+        when(userRepo.findTeacherById(5L)).thenReturn(Optional.ofNullable(teacher()));
+        when(userRepo.save(teacher())).thenReturn(teacher());
+        UserDto userDto = courseService.addTeacherToCourseById(54L, UserDto.builder().id(5L).build());
+        assertEquals(UserDto.map(teacher()), userDto);
+        verify(courseRepo).findById(54L);
+        verify(userRepo).findTeacherById(5L);
+        verify(userRepo).save(teacher());
+    }
+
+    @Test
+    void testAddStudentToCourseById() {
+        when(courseRepo.findById(54L)).thenReturn(Optional.ofNullable(course()));
+        when(userRepo.findStudentById(6L)).thenReturn(Optional.ofNullable(student()));
+        when(userRepo.save(student())).thenReturn(student());
+        UserDto userDto = courseService.addStudentToCourseById(54L, UserDto.builder().id(6L).build());
+        assertEquals(UserDto.map(student()), userDto);
+        verify(courseRepo).findById(54L);
+        verify(userRepo).findStudentById(6L);
+        verify(userRepo).save(student());
+    }
+
+    @Test
+    void testDeleteUserFromCourse() {
+        when(userRepo.findById(12L)).thenReturn(Optional.ofNullable(student()));
+        when(userRepo.save(student())).thenReturn(student());
+        ResponseEntity<String> result = courseService.deleteUserFromCourse(10L, UserDto.builder().id(12L).build());
+        assertEquals(new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT), result);
+        verify(userRepo).findById(12L);
+        verify(userRepo).save(student());
+    }
+
     private Course course() {
         return Course.builder()
                 .description("This is test course.")
@@ -119,21 +183,28 @@ class CourseServiceImplTest {
     }
 
     private Set<User> userList() {
-        return Set.of(
-                User.builder()
-                        .firstName("Teacher's first name")
-                        .lastName("Teacher's last name")
-                        .email("teacher@gmail.com")
-                        .role(Role.TEACHER)
-                        .active(true)
-                        .build(),
-                User.builder()
-                        .firstName("User's first name")
-                        .lastName("User's last name")
-                        .email("user@gmail.com")
-                        .role(Role.USER)
-                        .active(true)
-                        .build()
-        );
+        return Set.of(teacher(), student());
+    }
+
+    private User teacher() {
+        return User.builder()
+                .firstName("Teacher's first name")
+                .lastName("Teacher's last name")
+                .email("teacher@gmail.com")
+                .role(Role.TEACHER)
+                .courses(new HashSet<>())
+                .active(true)
+                .build();
+    }
+
+    private User student() {
+        return User.builder()
+                .firstName("User's first name")
+                .lastName("User's last name")
+                .email("user@gmail.com")
+                .role(Role.USER)
+                .courses(new HashSet<>())
+                .active(true)
+                .build();
     }
 }
