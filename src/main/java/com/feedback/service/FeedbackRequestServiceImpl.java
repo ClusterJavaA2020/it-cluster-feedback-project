@@ -12,16 +12,20 @@ import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
-import org.springframework.scheduling.annotation.Scheduled;
 import com.feedback.util.SwitcherDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static com.feedback.dto.FeedbackRequestDto.map;
 
 @Service
@@ -35,15 +39,15 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final UserRepo userRepo;
     private static final int day = 86400000;
 
-    public FeedbackRequestServiceImpl(UserService userService,UserRepo userRepo,FeedbackRequestRepo feedbackRequestRepo,
-                                    CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
+    public FeedbackRequestServiceImpl(UserService userService, UserRepo userRepo, FeedbackRequestRepo feedbackRequestRepo,
+                                      CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
                                       FeedbackRepo feedbackRepo) {
         this.feedbackRequestRepo = feedbackRequestRepo;
         this.courseRepo = courseRepo;
         this.feedbackAnswersRepo = feedbackAnswersRepo;
         this.feedbackRepo = feedbackRepo;
         this.userService = userService;
-        this.userRepo=userRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -71,7 +75,8 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
 
     @Override
     public List<FeedbackRequestDto> getFeedbackRequestList(Long courseId) {
-        return feedbackRequestRepo.findByCourseId(courseId);
+        return feedbackRequestRepo.findByCourseIdOrderByIdDesc(courseId)
+                .stream().map(FeedbackRequestDto::map).collect(Collectors.toList());
     }
 
     @Override
@@ -94,14 +99,31 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             course.get().getUsers().stream().filter(user -> user.getRole().equals(Role.USER)).forEach(user -> feedbackList.add(
                     Feedback.builder()
                             .userId(user.getId())
+                            .courseId(courseId)
                             .feedbackRequestId(feedbackRequest.map(FeedbackRequest::getId).orElse(null))
-                            .isActive(true)
+                            .date(LocalDateTime.now())
+                            .active(true)
                             .answers(feedbackAnswers.map(FeedbackAnswers::getAnswers).orElse(new LinkedHashSet<>()))
                             .build()
                     )
             );
             feedbackRepo.saveAll(feedbackList);
-            feedbackRequest.get().setActive(true);
+            feedbackRequest.get().setActive(switcherDto.isActive());
+            return map(feedbackRequestRepo.save(feedbackRequest.get()));
+        }
+        return null;
+    }
+
+    @Override
+    public FeedbackRequestDto finishFeedbackRequestSwitcher(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto) {
+        Optional<Course> course = courseRepo.findById(courseId);
+        Optional<FeedbackRequest> feedbackRequest = feedbackRequestRepo.findById(feedbackRequestId);
+        if (course.isPresent() && feedbackRequest.isPresent() && feedbackRequest.get().isActive() &&
+                feedbackRequest.get().getCourse().getId().equals(courseId)) {
+            feedbackRequest.get().setFinished(switcherDto.isActive());
+            List<Feedback> feedbackList = feedbackRepo.findByFeedbackRequestId(feedbackRequestId);
+            feedbackList.forEach(feedback -> feedback.setActive(!switcherDto.isActive()));
+            feedbackRepo.saveAll(feedbackList);
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
         return null;
@@ -127,9 +149,9 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
 
     @Override
     @Scheduled(fixedDelay = day)
-    public void reminder(){
-        feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
-                .stream().map(Feedback::getUserId).forEach(userId->{
+    public void reminder() {
+        feedbackRepo.findByActiveTrueAndSubmittedFalse()
+                .stream().map(Feedback::getUserId).forEach(userId -> {
             Optional<User> user = userRepo.findById(userId);
             user.ifPresent(userService::sendQuestionnaire);
         });

@@ -10,14 +10,14 @@ import lombok.Data;
 @AllArgsConstructor
 public class QuestionDto {
     private Long id;
-    private boolean isPattern;
+    private boolean pattern;
     private String questionValue;
 
     public static QuestionDto map(Question question) {
         return QuestionDto.builder()
                 .id(question.getId())
                 .questionValue(question.getQuestionValue())
-                .isPattern(question.isPattern())
+                .pattern(question.isPattern())
                 .build();
     }
 
@@ -25,7 +25,7 @@ public class QuestionDto {
         return Question.builder()
                 .id(questionDto.getId())
                 .questionValue(questionDto.getQuestionValue())
-                .isPattern(questionDto.isPattern())
+                .pattern(questionDto.isPattern())
                 .build();
     }
 }

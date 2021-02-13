@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -49,7 +50,7 @@ class FeedbackRequestServiceImplTest {
     private FeedbackAnswersRepo feedbackAnswersRepo;
 
     @InjectMocks
-    private FeedbackRequestServiceImpl feedbackRequestServiceImpl;
+    private FeedbackRequestServiceImpl feedbackRequestService;
 
     @BeforeEach
     public void setUp() {
@@ -58,7 +59,7 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo, feedbackRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo);
     }
 
     @Test
@@ -67,14 +68,14 @@ class FeedbackRequestServiceImplTest {
         when(feedbackRequestRepo.save(feedbackRequest())).thenReturn(feedbackRequestDB());
         when(feedbackAnswersRepo.save(feedbackAnswers())).thenReturn(feedbackAnswersDB());
         // NOT_NULL
-        FeedbackRequestDto requestDto = feedbackRequestServiceImpl.createFeedbackRequest(1L);
+        FeedbackRequestDto requestDto = feedbackRequestService.createFeedbackRequest(1L);
         assertNotNull(requestDto);
         assertEquals(map(feedbackRequestDB()), requestDto);
         verify(courseRepo).findById(1L);
         verify(feedbackRequestRepo).save(feedbackRequest());
         verify(feedbackAnswersRepo).save(feedbackAnswers());
         // NULL
-        FeedbackRequestDto requestDtoNull = feedbackRequestServiceImpl.createFeedbackRequest(2L);
+        FeedbackRequestDto requestDtoNull = feedbackRequestService.createFeedbackRequest(2L);
         assertNull(requestDtoNull);
         verify(courseRepo).findById(2L);
         verify(feedbackRequestRepo).save(feedbackRequest());
@@ -82,21 +83,21 @@ class FeedbackRequestServiceImplTest {
 
     @Test
     void testGetFeedbackRequestList() {
-        when(feedbackRequestRepo.findByCourseId(1L)).thenReturn(List.of(map(feedbackRequest())));
-        List<FeedbackRequestDto> feedbackRequestDto = feedbackRequestServiceImpl.getFeedbackRequestList(1L);
+        when(feedbackRequestRepo.findByCourseIdOrderByIdDesc(1L)).thenReturn(List.of(feedbackRequest()));
+        List<FeedbackRequestDto> feedbackRequestDto = feedbackRequestService.getFeedbackRequestList(1L);
         feedbackRequestDto.forEach(f -> {
             assertEquals(f.getStartDate(), feedbackRequest().getStartDate());
             assertEquals(f.getEndDate(), feedbackRequest().getEndDate());
             assertEquals(f.getCourseTitle(), feedbackRequest().getCourse().getTitle());
             assertEquals(f.getCourseId(), feedbackRequest().getCourse().getId());
         });
-        verify(feedbackRequestRepo).findByCourseId(1L);
+        verify(feedbackRequestRepo).findByCourseIdOrderByIdDesc(1L);
     }
 
     @Test
     void testGetFeedbackRequestById() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(ofNullable(feedbackRequest()));
-        FeedbackRequestDto feedbackRequestDto = feedbackRequestServiceImpl.getFeedbackRequestById(1L, 1L);
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestService.getFeedbackRequestById(1L, 1L);
         assertNotNull(feedbackRequestDto);
         assertEquals(feedbackRequestDto.getCourseTitle(), feedbackRequest().getCourse().getTitle());
         assertEquals(feedbackRequestDto.getCourseId(), feedbackRequest().getCourse().getId());
@@ -110,18 +111,34 @@ class FeedbackRequestServiceImplTest {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
         when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers());
-        when(feedbackRepo.saveAll(feedbackList())).thenReturn(feedbackList());
         when(feedbackRequestRepo.save(feedbackRequestDBActive())).thenReturn(feedbackRequestDBActive());
         FeedbackRequestDto feedbackRequestDto =
-                feedbackRequestServiceImpl.activateFeedbackRequest(1L, 1L,
+                feedbackRequestService.activateFeedbackRequest(1L, 1L,
                         SwitcherDto.builder().active(true).build());
         assertNotNull(feedbackRequestDto);
         assertEquals(feedbackRequestDto, map(feedbackRequestDBActive()));
         verify(courseRepo).findById(1L);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
-        verify(feedbackRepo).saveAll(feedbackList());
         verify(feedbackRequestRepo).save(feedbackRequestDBActive());
+    }
+
+    @Test
+    void testFinishFeedbackRequestSwitcher() {
+        when(courseRepo.findById(1L)).thenReturn(Optional.ofNullable(course()));
+        when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDBActive()));
+        when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackList());
+        when(feedbackRepo.saveAll(feedbackList())).thenReturn(feedbackList());
+        when(feedbackRequestRepo.save(feedbackRequestDBFinished())).thenReturn(feedbackRequestDBFinished());
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestService
+                .finishFeedbackRequestSwitcher(1L, 1L, SwitcherDto.builder().active(true).build());
+        assertNotNull(feedbackRequestDto);
+        assertEquals(map(feedbackRequestDBFinished()), feedbackRequestDto);
+        verify(courseRepo).findById(1L);
+        verify(feedbackRequestRepo).findById(1L);
+        verify(feedbackRepo).findByFeedbackRequestId(1L);
+        verify(feedbackRepo).saveAll(feedbackList());
+        verify(feedbackRequestRepo).save(feedbackRequestDBFinished());
     }
 
     @Test
@@ -132,7 +149,8 @@ class FeedbackRequestServiceImplTest {
         when(feedbackRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackList());
         doNothing().when(feedbackRepo).deleteAll(feedbackList());
         doNothing().when(feedbackAnswersRepo).delete(feedbackAnswers());
-        ResponseEntity<String> feedbackRequestDto = feedbackRequestServiceImpl.deleteFeedbackRequest(1L, 1L);
+        ResponseEntity<String> feedbackRequestDto = feedbackRequestService.deleteFeedbackRequest(1L, 1L);
+        assertEquals(new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT), feedbackRequestDto);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackRequestRepo).delete(feedbackRequestDB());
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
@@ -193,6 +211,12 @@ class FeedbackRequestServiceImplTest {
         return feedbackRequest;
     }
 
+    private FeedbackRequest feedbackRequestDBFinished() {
+        FeedbackRequest feedbackRequest = feedbackRequestDBActive();
+        feedbackRequest.setFinished(true);
+        return feedbackRequest;
+    }
+
     private FeedbackAnswers feedbackAnswers() {
         return FeedbackAnswers.builder()
                 .feedbackRequestId(1L)
@@ -211,7 +235,8 @@ class FeedbackRequestServiceImplTest {
         List<Feedback> feedbackList = new ArrayList<>();
         userSet.forEach(user -> {
             feedbackList.add(Feedback.builder()
-                    .isActive(true)
+                    .submitted(false)
+                    .courseId(1L)
                     .feedbackRequestId(1L)
                     .userId(user.getId())
                     .answers(feedbackAnswersDB().getAnswers())

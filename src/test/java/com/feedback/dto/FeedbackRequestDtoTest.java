@@ -16,7 +16,7 @@ class FeedbackRequestDtoTest {
     void testMap() {
         FeedbackRequest feedbackRequest = FeedbackRequest.builder()
                 .id(1L)
-                .isActive(true)
+                .active(true)
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(5))
                 .course(Course.builder()

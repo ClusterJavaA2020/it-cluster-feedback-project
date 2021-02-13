@@ -17,5 +17,7 @@ public interface FeedbackRequestService {
 
     ResponseEntity<String> deleteFeedbackRequest(Long courseId, Long feedbackRequestId);
 
+    FeedbackRequestDto finishFeedbackRequestSwitcher(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
+
     void reminder();
 }

@@ -42,8 +42,10 @@ public class UserAuthenticationController {
             User user = userService.findByEmail(authenticationDto.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User does not exists"));
             String token = jwtTokenProvider.createToken(authenticationDto.getEmail(), user.getRole().name());
             Map<Object, Object> response = new HashMap<>();
+            response.put("id", user.getId());
             response.put("email", authenticationDto.getEmail());
             response.put("token", token);
+            response.put("role", user.getRole());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Invalid email/password combination", HttpStatus.FORBIDDEN);
