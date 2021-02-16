@@ -24,20 +24,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.feedback.dto.FeedbackDto.map;
+
 @Service
 public class UserServiceImpl implements UserService{
     private final UserRepo userRepo;
     private final FeedbackRepo feedbackRepo;
     private final QuestionRepo questionRepo;
     private final FeedbackRequestRepo feedbackRequestRepo;
+    private final EmailSenderService emailSenderService;
 
 
     public UserServiceImpl(UserRepo userRepo, FeedbackRepo feedbackRepo, QuestionRepo questionRepo,
-                           FeedbackRequestRepo feedbackRequestRepo) {
+                           FeedbackRequestRepo feedbackRequestRepo, EmailSenderService emailSenderService) {
         this.userRepo = userRepo;
         this.feedbackRepo = feedbackRepo;
         this.questionRepo = questionRepo;
         this.feedbackRequestRepo = feedbackRequestRepo;
+        this.emailSenderService = emailSenderService;
     }
 
     @Override
@@ -95,4 +99,15 @@ public class UserServiceImpl implements UserService{
     public Optional<User> findByEmail(String email) {
         return userRepo.findUserByEmail(email);
     }
+    @Override
+    public void sendQuestionnaire(User user) {
+        final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(user.getEmail());
+        simpleMailMessage.setSubject("form");
+        simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
+        //user page is in process
+        simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
+        emailSenderService.sendEmail(simpleMailMessage);
+    }
+
 }
