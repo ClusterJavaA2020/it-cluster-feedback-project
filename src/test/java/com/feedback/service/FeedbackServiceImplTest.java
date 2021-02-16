@@ -22,10 +22,18 @@ import org.mockito.Mock;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.feedback.dto.FeedbackDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -69,6 +77,17 @@ class FeedbackServiceImplTest {
     }
 
     @Test
+    void testGetFeedbackByIdNegative() {
+        when(feedbackRepo.findById("6025991aa9c08c230ed6f39a")).thenReturn(Optional.empty());
+        FeedbackDto result = feedbackService.getFeedbackById(3L, 4L, "6025991aa9c08c230ed6f39a");
+        assertNull(result);
+        verify(feedbackRepo, times(1)).findById(anyString());
+        verify(userRepo, times(0)).findByIdIn(anySet());
+        verify(feedbackRequestRepo, times(0)).findByIdIn(anySet());
+        verify(questionRepo, times(0)).findByIdIn(anySet());
+    }
+
+    @Test
     void testGetSubmittedFeedbackByFeedbackRequestId() {
         when(feedbackRepo.findByCourseIdAndFeedbackRequestIdAndSubmittedTrue(3L, 4L))
                 .thenReturn(List.of(feedback()));
@@ -81,6 +100,27 @@ class FeedbackServiceImplTest {
         verify(userRepo).findByIdIn(setOf(2L, 7L));
         verify(feedbackRequestRepo).findByIdIn(setOf(4L));
         verify(questionRepo).findByIdIn(setOf(10L));
+    }
+
+    @Test
+    void testUpdateFeedbackAnswers() {
+        when(feedbackRepo.findById(anyString())).thenReturn(Optional.ofNullable(feedback()));
+        when(feedbackRepo.save(any())).thenReturn(feedback());
+        List<AnswerDto> answerDtos = List.of(answerDto());
+        List<Answer> answers = feedbackService.updateFeedbackAnswers(3L, 4L, "6025991aa9c08c230ed6f39a", answerDtos);
+        assertEquals(answerDtos.size(), answers.size());
+        verify(feedbackRepo, times(1)).findById(anyString());
+        verify(feedbackRepo, times(1)).save(any());
+    }
+
+    @Test
+    void testUpdateFeedbackAnswersNegativeCase() {
+        when(feedbackRepo.findById(anyString())).thenReturn(Optional.empty());
+        List<AnswerDto> answerDtos = List.of(answerDto());
+        List<Answer> answers = feedbackService.updateFeedbackAnswers(3L, 4L, "6025991aa9c08c230ed6f39a", answerDtos);
+        assertTrue(answers.isEmpty());
+        verify(feedbackRepo, times(1)).findById(anyString());
+        verify(feedbackRepo, times(0)).save(any());
     }
 
     private FeedbackRequest feedbackRequest() {

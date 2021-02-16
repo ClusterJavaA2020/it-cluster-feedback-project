@@ -27,8 +27,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -77,6 +82,34 @@ class AnswerServiceImplTest {
     }
 
     @Test
+    void testCreateAnswerWithEmptyTeacher() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.ofNullable(feedbackRequest()));
+        when(feedbackAnswersRepo.findByFeedbackRequestId(anyLong())).thenReturn(feedbackAnswers());
+        when(questionRepo.findById(anyLong())).thenReturn(Optional.ofNullable(question()));
+        when(userRepo.findTeacherById(anyLong())).thenReturn(Optional.empty());
+        Answer answer = answerService.createAnswer(1L, 1L, answer());
+        assertNull(answer);
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(1)).findByFeedbackRequestId(anyLong());
+        verify(questionRepo, times(1)).findById(anyLong());
+        verify(userRepo, times(1)).findTeacherById(anyLong());
+    }
+
+    @Test
+    void testCreateAnswerWithInvalidParams() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.ofNullable(feedbackRequest()));
+        when(feedbackAnswersRepo.findByFeedbackRequestId(anyLong())).thenReturn(feedbackAnswers());
+        when(questionRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepo.findTeacherById(anyLong())).thenReturn(Optional.ofNullable(user()));
+        Answer answer = answerService.createAnswer(2L, 1L, answer());
+        assertNull(answer);
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(1)).findByFeedbackRequestId(anyLong());
+        verify(questionRepo, times(1)).findById(anyLong());
+        verify(userRepo, times(1)).findTeacherById(anyLong());
+    }
+
+    @Test
     void testGetAnswersByFeedbackRequestId() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequest()));
         when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswersFilled());
@@ -98,6 +131,29 @@ class AnswerServiceImplTest {
     }
 
     @Test
+    void testGetAnswersByFeedbackRequestIdWithInvalidParams() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.of(feedbackRequest()));
+        Set<AnswerDto> answerDtoResult = answerService.getAnswersByFeedbackRequestId(2L, 1L);
+        assertTrue(answerDtoResult.isEmpty());
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(0)).findByFeedbackRequestId(anyLong());
+        verify(questionRepo, times(0)).findById(anyLong());
+        verify(userRepo, times(0)).findTeacherById(anyLong());
+    }
+
+    @Test
+    void testGetAnswersByFeedbackRequestIdEmptyFeedback() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.of(feedbackRequest()));
+        when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(null);
+        Set<AnswerDto> answerDtoResult = answerService.getAnswersByFeedbackRequestId(1L, 1L);
+        assertTrue(answerDtoResult.isEmpty());
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(1)).findByFeedbackRequestId(anyLong());
+        verify(questionRepo, times(0)).findById(anyLong());
+        verify(userRepo, times(0)).findTeacherById(anyLong());
+    }
+
+    @Test
     void testDeleteAnswer() {
         when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers(answer()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.ofNullable(feedbackRequest()));
@@ -108,6 +164,17 @@ class AnswerServiceImplTest {
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).save(feedbackAnswers());
+    }
+
+    @Test
+    void testDeleteAnswerWithInvalidParams() {
+        when(feedbackAnswersRepo.findByFeedbackRequestId(anyLong())).thenReturn(feedbackAnswers(answer()));
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.ofNullable(feedbackRequest()));
+        Set<Answer> answerSet = answerService.deleteAnswer(2L, 1L, answer());
+        assertTrue(answerSet.isEmpty());
+        verify(feedbackAnswersRepo, times(1)).findByFeedbackRequestId(anyLong());
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(0)).save(any());
     }
 
     private FeedbackRequest feedbackRequest() {
