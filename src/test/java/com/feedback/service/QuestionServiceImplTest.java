@@ -1,5 +1,6 @@
 package com.feedback.service;
 
+import com.feedback.dto.QuestionDto;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Question;
 import org.junit.jupiter.api.AfterEach;
@@ -13,8 +14,12 @@ import java.util.List;
 import static com.feedback.dto.QuestionDto.map;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -77,6 +82,16 @@ class QuestionServiceImplTest {
         assertEquals(questions().get(0), question);
         verify(questionRepo).findByQuestionValue("Some first custom question?");
         verify(questionRepo).save(questions().get(0));
+    }
+
+    @Test
+    void testAddQuestionNegativeCase() {
+        QuestionDto questionDto = map(questions().get(0));
+        questionDto.setQuestionValue(null);
+        Question question = questionService.addQuestion(questionDto);
+        assertNull(question);
+        verify(questionRepo, times(0)).findByQuestionValue(anyString());
+        verify(questionRepo, times(0)).save(any());
     }
 
     @Test
