@@ -31,12 +31,12 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final CourseRepo courseRepo;
     private final FeedbackAnswersRepo feedbackAnswersRepo;
     private final FeedbackRepo feedbackRepo;
-    private final UserService userService;
+    private final AuthenticationService userService;
     private final UserRepo userRepo;
     private static final int day = 86400000;
 
-    public FeedbackRequestServiceImpl(UserService userService,UserRepo userRepo,FeedbackRequestRepo feedbackRequestRepo,
-                                    CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
+    public FeedbackRequestServiceImpl(AuthenticationService userService, UserRepo userRepo, FeedbackRequestRepo feedbackRequestRepo,
+                                      CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
                                       FeedbackRepo feedbackRepo) {
         this.feedbackRequestRepo = feedbackRequestRepo;
         this.courseRepo = courseRepo;
@@ -128,10 +128,10 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     @Override
     @Scheduled(fixedDelay = day)
     public void reminder(){
-        feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
+     /*  feedbackRepo.findByIsActiveTrueAndIsSubmittedFalse()
                 .stream().map(Feedback::getUserId).forEach(userId->{
             Optional<User> user = userRepo.findById(userId);
             user.ifPresent(userService::sendQuestionnaire);
-        });
+        });*/
     }
 }
