@@ -33,7 +33,9 @@ import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -107,6 +109,14 @@ class FeedbackRequestServiceImplTest {
     }
 
     @Test
+    void testGetFeedbackRequestByIdNegativeCase() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.empty());
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestService.getFeedbackRequestById(1L, 1L);
+        assertNull(feedbackRequestDto);
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+    }
+
+    @Test
     void testActivateFeedbackRequest() {
         when(courseRepo.findById(1L)).thenReturn(Optional.of(course()));
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
@@ -121,6 +131,21 @@ class FeedbackRequestServiceImplTest {
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
         verify(feedbackRequestRepo).save(feedbackRequestDBActive());
+    }
+
+    @Test
+    void testActivateFeedbackRequestNegativeCase() {
+        when(courseRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(feedbackAnswersRepo.findByFeedbackRequestId(anyLong())).thenReturn(feedbackAnswers());
+        FeedbackRequestDto feedbackRequestDto =
+                feedbackRequestService.activateFeedbackRequest(1L, 1L,
+                        SwitcherDto.builder().active(true).build());
+        assertNull(feedbackRequestDto);
+        verify(courseRepo, times(1)).findById(anyLong());
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackAnswersRepo, times(1)).findByFeedbackRequestId(anyLong());
+        verify(feedbackRequestRepo, times(0)).save(feedbackRequestDBActive());
     }
 
     @Test
@@ -142,6 +167,20 @@ class FeedbackRequestServiceImplTest {
     }
 
     @Test
+    void testFinishFeedbackRequestSwitcherNegativeCase() {
+        when(courseRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.empty());
+        FeedbackRequestDto feedbackRequestDto = feedbackRequestService
+                .finishFeedbackRequestSwitcher(1L, 1L, SwitcherDto.builder().active(true).build());
+        assertNull(feedbackRequestDto);
+        verify(courseRepo, times(1)).findById(anyLong());
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackRepo, times(0)).findByFeedbackRequestId(anyLong());
+        verify(feedbackRepo, times(0)).saveAll(feedbackList());
+        verify(feedbackRequestRepo, times(0)).save(feedbackRequestDBFinished());
+    }
+
+    @Test
     void testDeleteFeedbackRequest() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequestDB()));
         doNothing().when(feedbackRequestRepo).delete(feedbackRequestDB());
@@ -157,6 +196,19 @@ class FeedbackRequestServiceImplTest {
         verify(feedbackRepo).findByFeedbackRequestId(1L);
         verify(feedbackRepo).deleteAll(feedbackList());
         verify(feedbackAnswersRepo).delete(feedbackAnswers());
+    }
+
+    @Test
+    void testDeleteFeedbackRequestNegativeCase() {
+        when(feedbackRequestRepo.findById(anyLong())).thenReturn(Optional.of(feedbackRequestDB()));
+        ResponseEntity<String> feedbackRequestDto = feedbackRequestService.deleteFeedbackRequest(2L, 1L);
+        assertEquals(new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST), feedbackRequestDto);
+        verify(feedbackRequestRepo, times(1)).findById(anyLong());
+        verify(feedbackRequestRepo, times(0)).delete(feedbackRequestDB());
+        verify(feedbackAnswersRepo, times(0)).findByFeedbackRequestId(anyLong());
+        verify(feedbackRepo, times(0)).findByFeedbackRequestId(anyLong());
+        verify(feedbackRepo, times(0)).deleteAll(feedbackList());
+        verify(feedbackAnswersRepo, times(0)).delete(feedbackAnswers());
     }
 
     private Set<User> setOfUsers() {

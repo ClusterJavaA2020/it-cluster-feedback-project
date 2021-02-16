@@ -26,6 +26,9 @@ import static com.feedback.dto.CourseDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -151,6 +154,17 @@ class CourseServiceImplTest {
     }
 
     @Test
+    void testAddTeacherToCourseByIdNegativeCase() {
+        when(courseRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepo.findTeacherById(anyLong())).thenReturn(Optional.empty());
+        UserDto userDto = courseService.addTeacherToCourseById(54L, UserDto.builder().id(5L).build());
+        assertNull(userDto);
+        verify(courseRepo, times(1)).findById(anyLong());
+        verify(userRepo, times(1)).findTeacherById(anyLong());
+        verify(userRepo, times(0)).save(teacher());
+    }
+
+    @Test
     void testAddStudentToCourseById() {
         when(courseRepo.findById(54L)).thenReturn(Optional.ofNullable(course()));
         when(userRepo.findStudentById(6L)).thenReturn(Optional.ofNullable(student()));
@@ -163,13 +177,32 @@ class CourseServiceImplTest {
     }
 
     @Test
+    void testAddStudentToCourseByIdNegativeCase() {
+        when(courseRepo.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepo.findStudentById(anyLong())).thenReturn(Optional.empty());
+        UserDto userDto = courseService.addStudentToCourseById(54L, UserDto.builder().id(6L).build());
+        assertNull(userDto);
+        verify(courseRepo, times(1)).findById(anyLong());
+        verify(userRepo, times(1)).findStudentById(anyLong());
+        verify(userRepo, times(0)).save(student());
+    }
+
+    @Test
     void testDeleteUserFromCourse() {
         when(userRepo.findById(12L)).thenReturn(Optional.ofNullable(student()));
-        when(userRepo.save(student())).thenReturn(student());
         ResponseEntity<String> result = courseService.deleteUserFromCourse(10L, UserDto.builder().id(12L).build());
         assertEquals(new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT), result);
         verify(userRepo).findById(12L);
         verify(userRepo).save(student());
+    }
+
+    @Test
+    void testDeleteUserFromCourseNegativeCase() {
+        when(userRepo.findById(anyLong())).thenReturn(Optional.empty());
+        ResponseEntity<String> result = courseService.deleteUserFromCourse(10L, UserDto.builder().id(12L).build());
+        assertEquals(new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST), result);
+        verify(userRepo, times(1)).findById(anyLong());
+        verify(userRepo, times(0)).save(student());
     }
 
     private Course course() {
