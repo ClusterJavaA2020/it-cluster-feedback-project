@@ -7,16 +7,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 public interface QuestionRepo extends JpaRepository<Question, Long> {
-    List<Question> findByIsPatternTrue();
+    List<Question> findByPatternTrue();
 
-    List<Question> findByIsPatternFalse();
+    List<Question> findByPatternFalse();
 
     Question findByQuestionValue(String questionValue);
 
+    Set<Question> findByIdIn(Set<Long> idSet);
+
     @Modifying
-    @Query(value = "UPDATE questions SET is_pattern = :isPattern where id = :id",nativeQuery = true)
+    @Query(value = "UPDATE questions SET is_pattern = :isPattern where id = :id", nativeQuery = true)
     @Transactional
-    void togglePattern(boolean isPattern,Long id);
+    void togglePattern(boolean isPattern, Long id);
 }

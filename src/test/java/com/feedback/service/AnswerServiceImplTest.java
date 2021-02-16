@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
+import com.feedback.dto.BriefUserDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
@@ -25,7 +26,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.feedback.dto.UserDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -68,7 +68,7 @@ class AnswerServiceImplTest {
         when(feedbackAnswersRepo.save(feedbackAnswers(answer()))).thenReturn(feedbackAnswers(answer()));
         Answer answer = answerService.createAnswer(1L, 1L, answer());
         assertNotNull(answer);
-        assertEquals(answer, answer());
+        assertEquals(answer(), answer);
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
         verify(questionRepo).findById(10L);
@@ -79,18 +79,22 @@ class AnswerServiceImplTest {
     @Test
     void testGetAnswersByFeedbackRequestId() {
         when(feedbackRequestRepo.findById(1L)).thenReturn(Optional.of(feedbackRequest()));
-        when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswers());
+        when(feedbackAnswersRepo.findByFeedbackRequestId(1L)).thenReturn(feedbackAnswersFilled());
+        when(questionRepo.findById(10L)).thenReturn(Optional.ofNullable(question()));
+        when(userRepo.findTeacherById(147L)).thenReturn(Optional.ofNullable(user()));
         Set<AnswerDto> answerDtoResult = answerService.getAnswersByFeedbackRequestId(1L, 1L);
         assertNotNull(answerDtoResult);
         answerDtoResult.forEach(item -> {
-            assertEquals(item.getQuestionId(), question().getId());
-            assertEquals(item.getQuestion(), question().getQuestionValue());
-            assertEquals(item.getTeacher(), map(user()));
-            assertEquals(item.getRate(), answer().getRate());
-            assertEquals(item.getComment(), answer().getComment());
+            assertEquals(question().getId(), item.getQuestionId());
+            assertEquals(question().getQuestionValue(), item.getQuestion());
+            assertEquals(BriefUserDto.map(user()), item.getTeacher());
+            assertEquals(answer().getRate(), item.getRate());
+            assertEquals(answer().getComment(), item.getComment());
         });
         verify(feedbackRequestRepo).findById(1L);
         verify(feedbackAnswersRepo).findByFeedbackRequestId(1L);
+        verify(questionRepo).findById(10L);
+        verify(userRepo).findTeacherById(147L);
     }
 
     @Test
@@ -118,7 +122,7 @@ class AnswerServiceImplTest {
     private Question question() {
         return Question.builder()
                 .id(10L)
-                .isPattern(true)
+                .pattern(true)
                 .questionValue("First question")
                 .build();
     }
@@ -149,6 +153,12 @@ class AnswerServiceImplTest {
                 .feedbackRequestId(1L)
                 .answers(new LinkedHashSet<>())
                 .build();
+    }
+
+    private FeedbackAnswers feedbackAnswersFilled() {
+        FeedbackAnswers feedbackAnswers = feedbackAnswers();
+        feedbackAnswers.getAnswers().add(answer());
+        return feedbackAnswers;
     }
 
     private FeedbackAnswers feedbackAnswers(Answer answer) {

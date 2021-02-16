@@ -34,7 +34,7 @@ public class Course {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean isActive = false;
+    private boolean active;
 
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();

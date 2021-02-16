@@ -46,6 +46,13 @@ public class FeedbackRequestController {
         return feedbackRequestService.activateFeedbackRequest(courseId, feedbackRequestId, switcherDto);
     }
 
+    @PutMapping("{courseId}/feedback-requests/{feedbackRequestId}/finish")
+    public FeedbackRequestDto finishFeedbackRequest(@PathVariable Long courseId,
+                                                    @PathVariable Long feedbackRequestId,
+                                                    @RequestBody SwitcherDto switcherDto) {
+        return feedbackRequestService.finishFeedbackRequestSwitcher(courseId, feedbackRequestId, switcherDto);
+    }
+
     @DeleteMapping("{courseId}/feedback-requests/{feedbackRequestId}")
     public ResponseEntity<String> deleteFeedbackRequest(@PathVariable Long courseId,
                                                         @PathVariable Long feedbackRequestId) {

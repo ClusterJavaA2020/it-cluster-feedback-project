@@ -1,7 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
-import com.feedback.dto.UserDto;
+import com.feedback.dto.BriefUserDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -58,7 +58,7 @@ public class AnswerServiceImpl implements AnswerService {
                         AnswerDto.builder()
                                 .questionId(answer.getQuestionId())
                                 .question(questionRepo.findById(answer.getQuestionId()).map(Question::getQuestionValue).orElse(null))
-                                .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(UserDto::map).orElse(null))
+                                .teacher(userRepo.findTeacherById(answer.getTeacherId()).map(BriefUserDto::map).orElse(null))
                                 .rate(answer.getRate())
                                 .comment(answer.getComment())
                                 .build()).collect(Collectors.toCollection(LinkedHashSet::new));

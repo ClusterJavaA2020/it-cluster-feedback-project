@@ -1,33 +1,98 @@
 package com.feedback.service;
 
 import com.feedback.dto.UserDto;
+import com.feedback.dto.CourseDto;
+import com.feedback.dto.FeedbackDto;
+import com.feedback.repo.FeedbackRepo;
+import com.feedback.repo.FeedbackRequestRepo;
+import com.feedback.repo.QuestionRepo;
 import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.repo.UserRepo;
+import com.feedback.repo.entity.Feedback;
+import com.feedback.repo.entity.FeedbackRequest;
+import com.feedback.repo.entity.Question;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService{
     private final UserRepo userRepo;
+    private final FeedbackRepo feedbackRepo;
+    private final QuestionRepo questionRepo;
+    private final FeedbackRequestRepo feedbackRequestRepo;
 
-    public UserServiceImpl(UserRepo userRepo) {
+
+    public UserServiceImpl(UserRepo userRepo, FeedbackRepo feedbackRepo, QuestionRepo questionRepo,
+                           FeedbackRequestRepo feedbackRequestRepo) {
         this.userRepo = userRepo;
+        this.feedbackRepo = feedbackRepo;
+        this.questionRepo = questionRepo;
+        this.feedbackRequestRepo = feedbackRequestRepo;
     }
 
     @Override
     public UserDto update(UserDto userDto) {
-       User user = userRepo.findUserByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
-       user.setFirstName(userDto.getFirstName());
-       user.setLastName(userDto.getLastName());
-       user.setEmail(userDto.getEmail());
-       user.setPhoneNumber(userDto.getEmail());
-       user.setRole(Role.valueOf(userDto.getRole()));
-       return UserDto.map(userRepo.save(user));
+        User user = userRepo.findUserByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setPhoneNumber(userDto.getEmail());
+        user.setRole(Role.valueOf(userDto.getRole()));
+        return UserDto.map(userRepo.save(user));
     }
 
     @Override
     public void delete(String email) {
         userRepo.deleteById(userRepo.findUserByEmail(email).orElseThrow(UserNotFoundException::new).getId());
+    }
+
+    @Override
+    public UserDto getUserById(Long userId) {
+        return userRepo.findById(userId).map(UserDto::map).orElse(null);
+    }
+
+    @Override
+    public Set<CourseDto> getUserCoursesByUserId(Long userId) {
+        return userRepo.findById(userId)
+                .map(u -> u.getCourses().stream().map(CourseDto::map)
+                        .sorted(Comparator.comparing(CourseDto::getStartDate).reversed())
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public List<FeedbackDto> getFeedbackByUserIdAndCourseId(Long userId, Long courseId) {
+        List<Feedback> feedbackList = feedbackRepo.findByUserIdAndCourseId(userId, courseId);
+        Set<Long> userIdSet = new HashSet<>();
+        Set<Long> feedbackRequestIdSet = new HashSet<>();
+        Set<Long> questionIdSet = new HashSet<>();
+        feedbackList.forEach(feedback -> {
+            userIdSet.add(feedback.getUserId());
+            feedbackRequestIdSet.add(feedback.getFeedbackRequestId());
+            feedback.getAnswers().forEach(answer -> {
+                questionIdSet.add(answer.getQuestionId());
+                userIdSet.add(answer.getTeacherId());
+            });
+        });
+        Set<User> userSet = userRepo.findByIdIn(userIdSet);
+        Set<FeedbackRequest> feedbackRequestSet = feedbackRequestRepo.findByIdIn(feedbackRequestIdSet);
+        Set<Question> questionSet = questionRepo.findByIdIn(questionIdSet);
+        return map(feedbackList, userSet, feedbackRequestSet, questionSet)
+                .stream().sorted(Comparator.comparing(FeedbackDto::getDate).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepo.findUserByEmail(email);
     }
 }

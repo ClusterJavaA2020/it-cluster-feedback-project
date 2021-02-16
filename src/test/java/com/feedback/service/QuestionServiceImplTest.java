@@ -13,6 +13,8 @@ import java.util.List;
 import static com.feedback.dto.QuestionDto.map;
 import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -45,18 +47,18 @@ class QuestionServiceImplTest {
 
     @Test
     void testGetPatterns() {
-        when(questionRepo.findByIsPatternTrue()).thenReturn(List.of(questions().get(1)));
+        when(questionRepo.findByPatternTrue()).thenReturn(List.of(questions().get(1)));
         List<Question> questionList = questionService.getPatterns();
         assertEquals(List.of(questions().get(1)), questionList);
-        verify(questionRepo).findByIsPatternTrue();
+        verify(questionRepo).findByPatternTrue();
     }
 
     @Test
     void testGetNonPatterns() {
-        when(questionRepo.findByIsPatternFalse()).thenReturn(List.of(questions().get(0)));
+        when(questionRepo.findByPatternFalse()).thenReturn(List.of(questions().get(0)));
         List<Question> questionList = questionService.getNonPatterns();
         assertEquals(List.of(questions().get(0)), questionList);
-        verify(questionRepo).findByIsPatternFalse();
+        verify(questionRepo).findByPatternFalse();
     }
 
     @Test
@@ -77,15 +79,25 @@ class QuestionServiceImplTest {
         verify(questionRepo).save(questions().get(0));
     }
 
+    @Test
+    void testTogglePattern() {
+        doNothing().when(questionRepo).togglePattern(true, 2L);
+        when(questionRepo.findById(2L)).thenReturn(java.util.Optional.ofNullable(questions().get(1)));
+        boolean result = questionService.togglePattern(true, 2L);
+        assertTrue(result);
+        verify(questionRepo).togglePattern(true, 2L);
+        verify(questionRepo).findById(2L);
+    }
+
     private List<Question> questions() {
         return List.of(Question.builder()
                         .id(1L)
-                        .isPattern(false)
+                        .pattern(false)
                         .questionValue("Some first custom question?")
                         .build(),
                 Question.builder()
                         .id(2L)
-                        .isPattern(true)
+                        .pattern(true)
                         .questionValue("Some second custom question?")
                         .build()
         );

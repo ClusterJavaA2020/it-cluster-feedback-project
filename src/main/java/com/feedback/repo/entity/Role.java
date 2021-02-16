@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 @Getter
 public enum Role {
     ADMINISTRATOR(Set.of(Permission.READ, Permission.WRITE, Permission.CREATE)),
-    TEACHER(Set.of(Permission.READ, Permission.WRITE, Permission.CREATE)),
-    USER(Set.of(Permission.READ, Permission.WRITE));
+    TEACHER(Set.of(Permission.READ, Permission.WRITE)),
+    USER(Set.of(Permission.READ));
 
     private final Set<Permission> permissions;
 

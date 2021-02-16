@@ -2,7 +2,9 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Set;
 
 public interface CourseService {
@@ -10,7 +12,7 @@ public interface CourseService {
 
     CourseDto get(Long id);
 
-    Set<CourseDto> getAll();
+    List<CourseDto> getAll();
 
     CourseDto update(CourseDto dto);
 
@@ -24,6 +26,12 @@ public interface CourseService {
 
     Set<UserDto> getTeachersNotFromCourse(Long courseId);
 
+    UserDto addTeacherToCourseById(Long courseId, UserDto teacher);
+
+    UserDto addStudentToCourseById(Long courseId, UserDto student);
+
+    ResponseEntity<String> deleteUserFromCourse(Long courseId, UserDto userDto);
 
     UserDto courseAddUser(Long courseId, Long userId);
+
 }
