@@ -12,12 +12,12 @@ import static org.mockito.Mockito.verify;
 public class EmailSenderServiceTest {
 
     @Test
-    public void testSendEmail(){
+    public void testSendEmail() {
         EmailSenderService emailSenderService = mock(EmailSenderService.class);
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo("testTo@mail.com");
         email.setFrom("testFrom@mail.com");
         emailSenderService.sendEmail(email);
-        verify(emailSenderService,times(1)).sendEmail(email);
+        verify(emailSenderService, times(1)).sendEmail(email);
     }
 }

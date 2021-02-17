@@ -42,10 +42,14 @@ public class AuthenticationServiceImplTest {
     private AuthenticationServiceImpl authenticationService;
 
     @BeforeEach
-    public void setUp() { openMocks(this); }
+    public void setUp() {
+        openMocks(this);
+    }
 
     @AfterEach
-    public void tearDown() { verifyNoMoreInteractions(userRepo, emailSenderService);}
+    public void tearDown() {
+        verifyNoMoreInteractions(userRepo, emailSenderService);
+    }
 
     @Test()
     public void testRegisterNewUser() {
@@ -59,17 +63,17 @@ public class AuthenticationServiceImplTest {
                 .build();
         when(userRepo.findUserByEmail("test@mail.com")).thenReturn(Optional.empty());
         when(passwordEncoder.encode(any())).thenReturn("test123");
-        when(userRepo.saveAndFlush(map(dto,(dto.getPassword())))).thenReturn(user());
+        when(userRepo.saveAndFlush(map(dto, (dto.getPassword())))).thenReturn(user());
         UserDto userDto = authenticationService.register(map(user()));
         assertNotNull(userDto);
         assertEquals(map(user()), userDto);
         verify(userRepo, times(1)).findUserByEmail("test@mail.com");
-        verify(userRepo, times(1)).saveAndFlush(map(dto,user().getPassword()));
+        verify(userRepo, times(1)).saveAndFlush(map(dto, user().getPassword()));
         verify(emailSenderService, times(1)).sendEmail(email());
     }
 
     @Test(expected = UserAlreadyExistException.class)
-    public void testRegisterExistingUser() throws UserAlreadyExistException{
+    public void testRegisterExistingUser() throws UserAlreadyExistException {
         UserDto dto = UserDto.builder()
                 .firstName("test")
                 .lastName("test")
@@ -90,10 +94,10 @@ public class AuthenticationServiceImplTest {
     @Test
     public void testSendRegistrationEmail() {
         emailSenderService.sendEmail(email());
-        verify(emailSenderService,times(1)).sendEmail(email());
+        verify(emailSenderService, times(1)).sendEmail(email());
     }
 
-    private User user(){
+    private User user() {
         return User.builder()
                 .id(1l)
                 .email("test@mail.com")
@@ -107,13 +111,13 @@ public class AuthenticationServiceImplTest {
     }
 
     private SimpleMailMessage email() {
-        SimpleMailMessage  email = new SimpleMailMessage();
+        SimpleMailMessage email = new SimpleMailMessage();
         Hashids hashids = new Hashids("id-secret");
         String id = hashids.encodeHex(user().getId().toString());
         email.setTo(user().getEmail());
         email.setFrom("feedbackapplication.mail@gmail.com");
         email.setSubject("You are almost registered!");
-        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/"+id);
+        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         return email;
     }
 

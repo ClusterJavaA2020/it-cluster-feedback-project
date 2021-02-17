@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static com.feedback.dto.FeedbackDto.map;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final FeedbackRepo feedbackRepo;
     private final QuestionRepo questionRepo;
@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService{
     public Optional<User> findByEmail(String email) {
         return userRepo.findUserByEmail(email);
     }
+
     @Override
     public void sendQuestionnaire(User user) {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();

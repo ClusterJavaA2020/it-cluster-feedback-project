@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserService {
-    UserDto update (UserDto userDto);
+    UserDto update(UserDto userDto);
 
-    void delete (String email);
+    void delete(String email);
 
     UserDto getUserById(Long userId);
 

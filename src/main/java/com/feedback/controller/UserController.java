@@ -27,13 +27,15 @@ public class UserController {
 
     @PutMapping()
     @PreAuthorize("hasAnyAuthority('user:write','admin:create')")
-    public UserDto update(@RequestBody UserDto userDto){
+    public UserDto update(@RequestBody UserDto userDto) {
         return userService.update(userDto);
     }
 
     @DeleteMapping("/{email}")
     @PreAuthorize("hasAuthority('admin:create')")
-    public void delete(@PathVariable String email){userService.delete(email);}
+    public void delete(@PathVariable String email) {
+        userService.delete(email);
+    }
 
     @GetMapping("/{userId}")
     public UserDto getUserById(@PathVariable Long userId) {
