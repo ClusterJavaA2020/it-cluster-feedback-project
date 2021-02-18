@@ -104,33 +104,6 @@ class UserServiceImplTest {
         verify(userRepo).findUserByEmail("student@mail.com");
     }
 
-//    @Test
-//    void testRegister() {
-//        UserDto userDto = userDto();
-//        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.empty());
-//        when(userRepo.saveAndFlush(any())).thenReturn(UserDto.map(userDto, "12123"));
-//        when(passwordEncoder.encode(anyString())).thenReturn("12123");
-//        doNothing().when(emailSenderService).sendEmail(any(SimpleMailMessage.class));
-//        UserDto result = userService.register(userDto);
-//        userDto.setPassword(null);
-//        assertEquals(result, userDto);
-//        verify(userRepo, times(1)).findUserByEmail(anyString());
-//        verify(userRepo, times(1)).saveAndFlush(any());
-//        verify(passwordEncoder, times(1)).encode(anyString());
-//        verify(emailSenderService, times(1)).sendEmail(any(SimpleMailMessage.class));
-//    }
-//
-//    @Test
-//    void testRegisterNegativeCase() {
-//        UserDto userDto = userDto();
-//        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(UserDto.map(userDto, "12123")));
-//        assertThrows(UserAlreadyExistException.class, () -> userService.register(userDto));
-//        verify(userRepo, times(1)).findUserByEmail(anyString());
-//        verify(userRepo, times(0)).saveAndFlush(any());
-//        verify(passwordEncoder, times(0)).encode(anyString());
-//        verify(emailSenderService, times(0)).sendEmail(any(SimpleMailMessage.class));
-//    }
-
     @Test
     void testSendQuestionnaire() {
         doNothing().when(emailSenderService).sendEmail(any(SimpleMailMessage.class));

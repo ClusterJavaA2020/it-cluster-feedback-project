@@ -10,8 +10,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-
 import java.util.Optional;
 
 @Service
@@ -57,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         simpleMailMessage.setTo(user.getEmail());
         simpleMailMessage.setSubject("You are almost registered!");
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
-        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/auth/register/confirm/" + id);
+        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
     }
 

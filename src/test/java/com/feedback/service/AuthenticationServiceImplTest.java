@@ -21,7 +21,10 @@ import java.util.Optional;
 import static com.feedback.dto.UserDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -97,6 +100,30 @@ public class AuthenticationServiceImplTest {
         verify(emailSenderService, times(1)).sendEmail(email());
     }
 
+    @Test
+    public void testRegister() {
+        UserDto userDto = map(user());
+        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepo.saveAndFlush(any())).thenReturn(UserDto.map(userDto, "test123"));
+        doNothing().when(emailSenderService).sendEmail(any(SimpleMailMessage.class));
+        UserDto result = authenticationService.register(userDto);
+        userDto.setPassword(null);
+        assertEquals(result, userDto);
+        verify(userRepo, times(1)).findUserByEmail(anyString());
+        verify(userRepo, times(1)).saveAndFlush(any());
+        verify(emailSenderService, times(1)).sendEmail(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    public void testRegisterNegativeCase() {
+        UserDto userDto = map(user());
+        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(UserDto.map(userDto, "12123")));
+        assertThrows(UserAlreadyExistException.class, () -> authenticationService.register(userDto));
+        verify(userRepo, times(1)).findUserByEmail(anyString());
+        verify(userRepo, times(0)).saveAndFlush(any());
+        verify(emailSenderService, times(0)).sendEmail(any(SimpleMailMessage.class));
+    }
+
     private User user() {
         return User.builder()
                 .id(1L)
@@ -117,7 +144,7 @@ public class AuthenticationServiceImplTest {
         email.setTo(user().getEmail());
         email.setFrom("feedbackapplication.mail@gmail.com");
         email.setSubject("You are almost registered!");
-        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/auth/register/confirm/" + id);
+        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         return email;
     }
 
