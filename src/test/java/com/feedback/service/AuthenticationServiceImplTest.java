@@ -99,7 +99,7 @@ public class AuthenticationServiceImplTest {
 
     private User user() {
         return User.builder()
-                .id(1l)
+                .id(1L)
                 .email("test@mail.com")
                 .firstName("test")
                 .lastName("test")
@@ -117,7 +117,7 @@ public class AuthenticationServiceImplTest {
         email.setTo(user().getEmail());
         email.setFrom("feedbackapplication.mail@gmail.com");
         email.setSubject("You are almost registered!");
-        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
+        email.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/auth/register/confirm/" + id);
         return email;
     }
 
