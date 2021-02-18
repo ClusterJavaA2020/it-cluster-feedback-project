@@ -27,7 +27,7 @@ public class UserDto {
     private String password;
     @Pattern(regexp = "^\\+38\\(0[0-9]{2}\\)[0-9]{3}\\-[0-9]{4}$", message = "Phone Number should have format +38(0XX)XXX-XXXX")
     private String phoneNumber;
-    private String role = String.valueOf(Role.USER);
+    private String role;
 
     public static User map(UserDto userDto,String password){
         return User.builder()
