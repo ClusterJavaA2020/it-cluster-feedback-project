@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  db:
+    image: "mongo:latest"
+    environment:
+      - MONGO_USER=root
+      - MONGO_PASSWORD=pass
+      - MONGO_DB=feedback
+    ports:
+      - "27017:27017"
+  feedback_backend:
+    image: "javatrap/it-cluster-feedback-frontend-b"
+    ports:
+      - "8080:8080"
+    links:
+      - "db:feedback"
+    depends_on:
+      - "db"
+  ui:
+    image: "javatrap/it-cluster-feedback-frontend-a"
+    ports:
+      - "4200:4200"
+    links:
+      - "db:feedback"
+    depends_on:
+      - "db"
