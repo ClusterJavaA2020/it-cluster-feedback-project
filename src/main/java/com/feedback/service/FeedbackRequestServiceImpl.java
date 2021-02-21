@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
@@ -21,9 +22,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
@@ -155,5 +158,14 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             Optional<User> user = userRepo.findById(userId);
             user.ifPresent(userService::sendQuestionnaire);
         });
+    }
+
+    @Override
+    public Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId) {
+        Set<User> userSet = new HashSet<>();
+        feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(courseId, feedbackRequestId)
+                .forEach(feedback -> userSet.add(userRepo.findById(feedback.getUserId()).orElse(null)));
+        userSet.forEach(userService::sendQuestionnaire);
+        return userSet.stream().map(UserDto::map).collect(Collectors.toSet());
     }
 }

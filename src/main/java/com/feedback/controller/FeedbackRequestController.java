@@ -1,6 +1,7 @@
 package com.feedback.controller;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.service.FeedbackRequestService;
 import com.feedback.util.SwitcherDto;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/courses/")
@@ -57,5 +59,10 @@ public class FeedbackRequestController {
     public ResponseEntity<String> deleteFeedbackRequest(@PathVariable Long courseId,
                                                         @PathVariable Long feedbackRequestId) {
         return feedbackRequestService.deleteFeedbackRequest(courseId, feedbackRequestId);
+    }
+
+    @PostMapping("{courseId}/feedback-requests/{feedbackRequestId}/reminding")
+    public Set<UserDto> remindUsersWithoutFeedback(@PathVariable Long courseId, @PathVariable Long feedbackRequestId) {
+        return feedbackRequestService.remindUsersWithoutFeedback(courseId, feedbackRequestId);
     }
 }

@@ -2,8 +2,10 @@ package com.feedback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.FeedbackRequest;
+import com.feedback.repo.entity.User;
 import com.feedback.service.FeedbackRequestService;
 import com.feedback.util.SwitcherDto;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
 import static com.feedback.service.FeedbackRequestServiceImpl.END_DATE;
@@ -135,6 +138,19 @@ class FeedbackRequestControllerTest {
 
     }
 
+    @WithMockUser
+    @Test
+    void testRemindUsersWithoutFeedback() throws Exception {
+        when(feedbackRequestService.remindUsersWithoutFeedback(15L, 1L))
+                .thenReturn(Set.of(UserDto.map(user())));
+        MvcResult mvcResult = mockMvc
+                .perform(post("/courses/15/feedback-requests/1/reminding")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        verify(feedbackRequestService).remindUsersWithoutFeedback(15L, 1L);
+    }
+
     private Course course() {
         return Course.builder()
                 .id(15L)
@@ -161,6 +177,15 @@ class FeedbackRequestControllerTest {
     private SwitcherDto switcherDto() {
         return SwitcherDto.builder()
                 .active(true)
+                .build();
+    }
+
+    private User user() {
+        return User.builder()
+                .id(32L)
+                .email("controller@gmail.com")
+                .firstName("FirstName")
+                .lastName("LastName")
                 .build();
     }
 }
