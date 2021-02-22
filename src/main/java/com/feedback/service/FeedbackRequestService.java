@@ -20,4 +20,6 @@ public interface FeedbackRequestService {
     FeedbackRequestDto finishFeedbackRequestSwitcher(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
 
     void reminder();
+
+    void finishedFeedbackRequests();
 }

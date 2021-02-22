@@ -156,4 +156,16 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             user.ifPresent(userService::sendQuestionnaire);
         });
     }
+
+    @Override
+    @Scheduled(fixedDelay = day)
+    public void finishedFeedbackRequests() {
+        List<FeedbackRequest> unFinishedFeedbackRequests =  feedbackRequestRepo.findAllByActiveIsTrueAndFinishedIsFalse();
+        unFinishedFeedbackRequests.forEach(v->{
+            if (v.getEndDate().equals(LocalDate.now())){
+                v.setFinished(true);
+                feedbackRequestRepo.save(v);
+            }
+        });
+    }
 }
