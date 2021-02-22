@@ -63,7 +63,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             Set<Question> questionSet = questionRepo.findByIdIn(questionIdSet);
             return map(List.of(feedback), userSet, feedbackRequestSet, questionSet).stream().findFirst().orElse(null);
         }
-        log.info("Receiving feedback{} for course{} by feedback request id{}",feedbackId,courseId,feedbackRequestId);
+        log.info("Receiving feedback{} for course{} by feedback request id{}", feedbackId, courseId, feedbackRequestId);
         return null;
     }
 
@@ -84,7 +84,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Set<User> userSet = userRepo.findByIdIn(userIdSet);
         Set<FeedbackRequest> feedbackRequestSet = feedbackRequestRepo.findByIdIn(feedbackRequestIdSet);
         Set<Question> questionSet = questionRepo.findByIdIn(questionIdSet);
-        log.info("Receiving submitted feedback by feedback request id{} for course{}",feedbackRequestId, courseId);
+        log.info("Receiving submitted feedback by feedback request id{} for course{}", feedbackRequestId, courseId);
         return map(feedbackList, userSet, feedbackRequestSet, questionSet)
                 .stream().sorted(Comparator.comparing(FeedbackDto::getDate).reversed())
                 .collect(Collectors.toList());
@@ -100,13 +100,13 @@ public class FeedbackServiceImpl implements FeedbackService {
             feedback.setAnswers(answerDtoList.stream().map(AnswerDto::map).collect(Collectors.toCollection(LinkedHashSet::new)));
             return new ArrayList<>(feedbackRepo.save(feedback).getAnswers());
         }
-        log.info("Updating answers{} in feedback{} for feedback request{} and course{}",answerDtoList,feedbackId,feedbackRequestId,courseId);
+        log.info("Updating answers{} in feedback{} for feedback request{} and course{}", answerDtoList, feedbackId, feedbackRequestId, courseId);
         return Collections.emptyList();
     }
 
     @Override
     public List<Feedback> getAllByFeedbackRequestId(int id) {
-        log.info("Receiving all feedbacks by feedback request id{}",id);
+        log.info("Receiving all feedbacks by feedback request id{}", id);
         return feedbackRepo.findAllByFeedbackRequestId(id);
     }
 

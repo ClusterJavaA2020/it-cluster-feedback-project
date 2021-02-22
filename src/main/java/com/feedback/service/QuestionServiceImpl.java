@@ -43,7 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Question getQuestionById(Long questionId) {
-        log.info("Receiving question by id{}",questionId);
+        log.info("Receiving question by id{}", questionId);
         return questionRepo.findById(questionId).orElse(null);
     }
 
@@ -53,7 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
             return null;
         }
         Question question = questionRepo.findByQuestionValue(questionDto.getQuestionValue());
-        log.info("Adding new question{}",questionDto);
+        log.info("Adding new question{}", questionDto);
         if (question == null) {
             return questionRepo.save(map(questionDto));
         } else {
@@ -66,7 +66,7 @@ public class QuestionServiceImpl implements QuestionService {
     public boolean togglePattern(boolean isPattern, Long id) {
         questionRepo.togglePattern(isPattern, id);
         Question question = questionRepo.findById(id).orElseThrow(QuestionNotFoundException::new);
-        log.info("Toggling pattern{} for question by question id{}",isPattern,id);
+        log.info("Toggling pattern{} for question by question id{}", isPattern, id);
         return question.isPattern();
     }
 }

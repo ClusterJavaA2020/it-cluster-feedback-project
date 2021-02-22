@@ -62,19 +62,19 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepo.saveAndFlush(UserDto.map(userDto, passwordEncoder.encode(userDto.getPassword())));
         sendRegistrationEmail(user);
-        log.info("Registering new user{}",userDto);
+        log.info("Registering new user{}", userDto);
         return UserDto.map(user);
     }
 
     @Override
     public UserDto getUserById(Long userId) {
-        log.info("Receiving user by user id{}",userId);
+        log.info("Receiving user by user id{}", userId);
         return userRepo.findById(userId).map(UserDto::map).orElse(null);
     }
 
     @Override
     public Set<CourseDto> getUserCoursesByUserId(Long userId) {
-        log.info("Receiving user courses by user id{}",userId);
+        log.info("Receiving user courses by user id{}", userId);
         return userRepo.findById(userId)
                 .map(u -> u.getCourses().stream().map(CourseDto::map)
                         .sorted(Comparator.comparing(CourseDto::getStartDate).reversed())
@@ -99,14 +99,14 @@ public class UserServiceImpl implements UserService {
         Set<User> userSet = userRepo.findByIdIn(userIdSet);
         Set<FeedbackRequest> feedbackRequestSet = feedbackRequestRepo.findByIdIn(feedbackRequestIdSet);
         Set<Question> questionSet = questionRepo.findByIdIn(questionIdSet);
-        log.info("Receiving feedback by user id{} and course id{}",userId,courseId);
+        log.info("Receiving feedback by user id{} and course id{}", userId, courseId);
         return map(feedbackList, userSet, feedbackRequestSet, questionSet)
                 .stream().sorted(Comparator.comparing(FeedbackDto::getDate).reversed())
                 .collect(Collectors.toList());
     }
 
     public Optional<User> findByEmail(String email) {
-        log.info("Finding user by email{}",email);
+        log.info("Finding user by email{}", email);
         return userRepo.findUserByEmail(email);
     }
 
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findById(Long.parseLong(hashids.decodeHex(id))).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
         userRepo.save(user);
-        log.info("Setting active status of user{}",id);
+        log.info("Setting active status of user{}", id);
     }
 
     private void sendRegistrationEmail(User user) {
@@ -128,8 +128,9 @@ public class UserServiceImpl implements UserService {
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
         simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
-        log.info("Sending registration email to user{}",user);
+        log.info("Sending registration email to user{}", user);
     }
+
     @Override
     public void sendQuestionnaire(User user) {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
@@ -139,7 +140,7 @@ public class UserServiceImpl implements UserService {
         //user page is in process
         simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
         emailSenderService.sendEmail(simpleMailMessage);
-        log.info("Sending questionnaire to user{} email",user);
+        log.info("Sending questionnaire to user{} email", user);
     }
 
 }
