@@ -10,6 +10,10 @@ import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.FeedbackAnswers;
 import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Question;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.web.server.ui.LogoutPageGeneratingWebFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -17,12 +21,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AnswerServiceImpl implements AnswerService {
     private final UserRepo userRepo;
     private final QuestionRepo questionRepo;
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final FeedbackAnswersRepo feedbackAnswersRepo;
+    private static Logger logger = LoggerFactory.getLogger(AnswerServiceImpl.class);
 
     public AnswerServiceImpl(UserRepo userRepo, QuestionRepo questionRepo, FeedbackRequestRepo feedbackRequestRepo,
                              FeedbackAnswersRepo feedbackAnswersRepo) {
@@ -45,6 +51,7 @@ public class AnswerServiceImpl implements AnswerService {
             feedbackAnswersRepo.save(feedbackAnswers);
             return answer;
         }
+        log.info("Creating answer{} for course {} and feedback request {}",answer, courseId, feedbackRequestId);
         return null;
     }
 
@@ -64,6 +71,7 @@ public class AnswerServiceImpl implements AnswerService {
                                 .build()).collect(Collectors.toCollection(LinkedHashSet::new));
             }
         }
+        log.info("Receiving answers for course{} BY feedback request id{}",courseId,feedbackRequestId);
         return Collections.emptySet();
     }
 
@@ -75,10 +83,12 @@ public class AnswerServiceImpl implements AnswerService {
             feedbackAnswers.getAnswers().removeIf(a -> a.equals(answerToRemove));
             return feedbackAnswersRepo.save(feedbackAnswers).getAnswers();
         }
-        return Collections.emptySet();
+        log.info("Deleting answer{} for course{} and feedback request{}",answerToRemove,courseId,feedbackRequestId);
+        return  Collections.emptySet();
     }
 
     private boolean isValidRequestParams(Long courseId, FeedbackRequest feedbackRequest) {
+        log.info("Checking if the feedbackRequest{} equals courseId{}",feedbackRequest,courseId);
         return feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId);
     }
 }

@@ -8,6 +8,9 @@ import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,10 +21,12 @@ import java.util.stream.Collectors;
 
 import static com.feedback.dto.CourseDto.map;
 
+@Slf4j
 @Service
 public class CourseServiceImpl implements CourseService {
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
+    private static Logger logger = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     public CourseServiceImpl(CourseRepo courseRepo, UserRepo userRepo) {
         this.courseRepo = courseRepo;
@@ -30,16 +35,19 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto create(CourseDto dto) {
+        log.info("Creating new course{}",dto);
         return map(courseRepo.save(map(dto)));
     }
 
     @Override
     public CourseDto get(Long id) {
+        log.info("Receiving course id{}",id);
         return courseRepo.findById(id).map(CourseDto::map).orElseThrow(CourseNotFoundException::new);
     }
 
     @Override
     public List<CourseDto> getAll() {
+        log.info("Receiving all courses");
         return courseRepo.findByOrderByStartDateDesc().stream()
                 .map(CourseDto::map)
                 .collect(Collectors.toList());
@@ -47,16 +55,19 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto update(CourseDto dto) {
+        log.info("Updating course{}",dto);
         return map(courseRepo.save(map(dto)));
     }
 
     @Override
     public CourseDto delete(CourseDto dto) {
+        log.info("Deleting course{}",dto);
         return null;
     }
 
     @Override
     public Set<UserDto> getCourseTeachers(Long courseId) {
+        log.info("Receiving teachers from course{}",courseId);
         return courseRepo.findById(courseId).map(value -> value
                 .getUsers()
                 .stream()
@@ -67,6 +78,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Set<UserDto> getCourseStudents(Long courseId) {
+        log.info("Receiving students from course{}",courseId);
         return courseRepo.findById(courseId).map(value -> value
                 .getUsers()
                 .stream()
@@ -77,6 +89,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Set<UserDto> getStudentsNotFromCourse(Long courseId) {
+        log.info("Receiving students not from course{}",courseId);
         return userRepo.findStudentsNotFromCourse(courseId).stream()
                 .map(UserDto::map)
                 .collect(Collectors.toSet());
@@ -84,6 +97,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Set<UserDto> getTeachersNotFromCourse(Long courseId) {
+        log.info("Receiving teachers not from course{}",courseId);
         return userRepo.findTeachersNotFromCourse(courseId).stream()
                 .map(UserDto::map)
                 .collect(Collectors.toSet());
@@ -97,6 +111,7 @@ public class CourseServiceImpl implements CourseService {
             teacher.getCourses().add(course);
             return UserDto.map(userRepo.save(teacher));
         }
+        log.info("Adding teacher{} to course{}",user,courseId);
         return null;
     }
 
@@ -108,6 +123,7 @@ public class CourseServiceImpl implements CourseService {
             student.getCourses().add(course);
             return UserDto.map(userRepo.save(student));
         }
+        log.info("Adding student{} to course{}",user,courseId);
         return null;
     }
 
@@ -119,6 +135,7 @@ public class CourseServiceImpl implements CourseService {
             userRepo.save(user);
             return new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT);
         }
+        log.info("Deleting user{} from course{}",userDto,courseId);
         return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
     }
 
@@ -126,6 +143,7 @@ public class CourseServiceImpl implements CourseService {
     public UserDto courseAddUser(Long userId, Long courseId) {
         User user = userRepo.findById(userId).orElse(null);
         courseRepo.saveUserInCourse(userId, courseId);
+        log.info("Saving user{} in course{}",userId,courseId);
         return UserDto.map(user);
     }
 
