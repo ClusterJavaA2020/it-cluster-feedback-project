@@ -1,10 +1,12 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.util.SwitcherDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Set;
 
 public interface FeedbackRequestService {
     FeedbackRequestDto createFeedbackRequest(Long courseId);
@@ -20,4 +22,6 @@ public interface FeedbackRequestService {
     FeedbackRequestDto finishFeedbackRequestSwitcher(Long courseId, Long feedbackRequestId, SwitcherDto switcherDto);
 
     void reminder();
+
+    Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId);
 }
