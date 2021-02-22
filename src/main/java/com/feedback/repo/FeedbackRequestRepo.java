@@ -14,9 +14,6 @@ public interface FeedbackRequestRepo extends JpaRepository<FeedbackRequest, Long
 
     Set<FeedbackRequest> findByIdIn(Set<Long> idSet);
 
-    @Modifying
-    @Query(value = "select * from feedback_requests where is_active = true and is_finished = false ",nativeQuery = true)
-    @Transactional
-    List<FeedbackRequest> findAllByActiveIsTrueAndFinishedIsFalse();
+    List<FeedbackRequest> findByActiveTrueAndFinishedFalse();
 
 }
