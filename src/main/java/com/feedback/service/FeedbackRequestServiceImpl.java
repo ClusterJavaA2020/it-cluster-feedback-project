@@ -162,9 +162,10 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
 
     @Override
     public Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId) {
-        Set<User> userSet = new HashSet<>();
+        Set<Long> userIdSet = new HashSet<>();
         feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(courseId, feedbackRequestId)
-                .forEach(feedback -> userSet.add(userRepo.findById(feedback.getUserId()).orElse(null)));
+                .forEach(feedback -> userIdSet.add(feedback.getUserId()));
+        Set<User> userSet = userRepo.findByIdIn(userIdSet);
         userSet.forEach(userService::sendQuestionnaire);
         return userSet.stream().map(UserDto::map).collect(Collectors.toSet());
     }

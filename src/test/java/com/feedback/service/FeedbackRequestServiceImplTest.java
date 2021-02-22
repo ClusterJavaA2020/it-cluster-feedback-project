@@ -221,12 +221,12 @@ class FeedbackRequestServiceImplTest {
     void testRemindUsersWithoutFeedback() {
         when(feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(1L, 1L))
                 .thenReturn(List.of(feedback()));
-        when(userRepo.findById(100L)).thenReturn(Optional.ofNullable(user()));
+        when(userRepo.findByIdIn(Set.of(100L))).thenReturn(Set.of(user()));
         doNothing().when(userService).sendQuestionnaire(user());
         Set<UserDto> userSet = feedbackRequestService.remindUsersWithoutFeedback(1L, 1L);
         assertEquals(Set.of(UserDto.map(user())), userSet);
         verify(feedbackRepo).findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(1L, 1L);
-        verify(userRepo).findById(100L);
+        verify(userRepo).findByIdIn(Set.of(100L));
         verify(userService).sendQuestionnaire(user());
 
     }
