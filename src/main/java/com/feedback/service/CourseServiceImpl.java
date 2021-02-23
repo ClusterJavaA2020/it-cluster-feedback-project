@@ -26,7 +26,6 @@ import static com.feedback.dto.CourseDto.map;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
-    private static Logger logger = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     public CourseServiceImpl(CourseRepo courseRepo, UserRepo userRepo) {
         this.courseRepo = courseRepo;

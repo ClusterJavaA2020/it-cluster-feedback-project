@@ -35,7 +35,6 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final QuestionRepo questionRepo;
     private final UserRepo userRepo;
-    private static Logger logger = LoggerFactory.getLogger(FeedbackServiceImpl.class);
 
     public FeedbackServiceImpl(FeedbackRepo feedbackRepo, FeedbackRequestRepo feedbackRequestRepo, QuestionRepo questionRepo, UserRepo userRepo) {
         this.feedbackRepo = feedbackRepo;

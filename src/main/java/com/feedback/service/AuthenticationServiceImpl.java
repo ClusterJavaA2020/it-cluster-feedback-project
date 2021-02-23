@@ -5,6 +5,7 @@ import com.feedback.exceptions.UserAlreadyExistException;
 import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.hashids.Hashids;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepo userRepo;
@@ -33,10 +35,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = userRepo.saveAndFlush(UserDto.map(userDto, passwordEncoder.encode(userDto.getPassword())));
         sendRegistrationEmail(user);
+        log.info("Registering new user{}", userDto);
         return UserDto.map(user);
     }
 
     public Optional<User> findByEmail(String email) {
+        log.info("Finding user by email{}", email);
         return userRepo.findUserByEmail(email);
     }
 
@@ -45,6 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepo.findById(Long.parseLong(hashids.decodeHex(id))).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
         userRepo.save(user);
+        log.info("Confirming users{} email", id);
     }
 
     private void sendRegistrationEmail(User user) {
@@ -57,6 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
         simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://localhost:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
+        log.info("Sending registration email to user{}", user);
     }
 
     @Override
@@ -68,6 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //user page is in process
         simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
         emailSenderService.sendEmail(simpleMailMessage);
+        log.info("Sending questionnaire to users{} email", user);
     }
 
 }

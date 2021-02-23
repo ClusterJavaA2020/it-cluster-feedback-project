@@ -44,7 +44,6 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     private final UserService userService;
     private final UserRepo userRepo;
     private static final int day = 86400000;
-    private static Logger logger = LoggerFactory.getLogger(FeedbackRequestServiceImpl.class);
 
     public FeedbackRequestServiceImpl(UserService userService, UserRepo userRepo, FeedbackRequestRepo feedbackRequestRepo,
                                       CourseRepo courseRepo, FeedbackAnswersRepo feedbackAnswersRepo,
@@ -177,6 +176,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
                 .stream().map(Feedback::getUserId).collect(Collectors.toSet());
         Set<User> userSet = userRepo.findByIdIn(userIdSet);
         userSet.forEach(userService::sendQuestionnaire);
+        log.info("Reminding users from course{} about feedback request{}", courseId, feedbackRequestId);
         return userSet.stream().map(UserDto::map).collect(Collectors.toSet());
     }
 }

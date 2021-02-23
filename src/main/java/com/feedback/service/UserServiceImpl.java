@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(String email) {
         userRepo.deleteById(userRepo.findUserByEmail(email).orElseThrow(UserNotFoundException::new).getId());
+        log.info("Deleting user{}", email);
     }
 
     @Override
@@ -115,6 +116,7 @@ public class UserServiceImpl implements UserService {
         //user page is in process
         simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
         emailSenderService.sendEmail(simpleMailMessage);
+        log.info("Sending questionnaire to users{} email", user);
     }
 
 }

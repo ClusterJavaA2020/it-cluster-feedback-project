@@ -28,7 +28,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final QuestionRepo questionRepo;
     private final FeedbackRequestRepo feedbackRequestRepo;
     private final FeedbackAnswersRepo feedbackAnswersRepo;
-    private static Logger logger = LoggerFactory.getLogger(AnswerServiceImpl.class);
 
     public AnswerServiceImpl(UserRepo userRepo, QuestionRepo questionRepo, FeedbackRequestRepo feedbackRequestRepo,
                              FeedbackAnswersRepo feedbackAnswersRepo) {
