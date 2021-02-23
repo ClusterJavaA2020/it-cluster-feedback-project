@@ -1,26 +1,69 @@
-version: "3.8"
+version: '3.7'
+
 services:
-  db:
-    image: "mongo:latest"
-    environment:
-      - MONGO_USER=root
-      - MONGO_PASSWORD=pass
-      - MONGO_DB=feedback
-    ports:
-      - "27017:27017"
-  feedback_backend:
-    image: "javatrap/it-cluster-feedback-frontend-b"
+  feedback-server:
+    image: javatrap/it-cluster-feedback-backend
+    container_name: "it-cluster-feedback-backend"
     ports:
       - "8080:8080"
-    links:
-      - "db:feedback"
+    restart: always
     depends_on:
-      - "db"
-  ui:
-    image: "javatrap/it-cluster-feedback-frontend-a"
+      - db_m
+    environment:
+      URL_SQL: database-feedback-mysql-1.c3flf4yezuf3.eu-west-2.rds.amazonaws.com
+      SQL_DATABASE: feedback
+      SQL_USERNAME: admin
+      SQL_PASSWORD: passpass
+
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: pass
+      MONGO_DATABASE: feedback
+      MONGO_HOST: db_m
+    hostname: feedback-server
+    networks:
+      - backend
+      - frontend
+    tty: true
+    command: bash /root/src/feedback-server.bash
+
+
+  feedback-client:
+    image: javatrap/it-cluster-feedback-frontend
+    container_name: "it-cluster-feedback-frontend"
     ports:
       - "4200:4200"
-    links:
-      - "db:feedback"
+    restart: always
     depends_on:
-      - "db"
+      - feedback-server
+    hostname: feedback-client
+    links:
+      - feedback-server
+    networks:
+      - frontend
+    tty: true
+
+
+  db_m:
+    image: mongo:latest
+    container_name: "mongo_db"
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: pass
+      MONGO_DATABASE: feedback
+      MONGO_HOST: db_m
+    hostname: db_m
+    volumes:
+      - db_m-data:/data/db
+    networks:
+      - backend
+      - frontend
+
+volumes:
+  db_m-data:
+
+networks:
+  backend:
+  frontend:
