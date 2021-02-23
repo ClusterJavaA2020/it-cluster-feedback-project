@@ -5,7 +5,6 @@ import com.feedback.dto.BriefUserDto;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.dto.UserDto;
-import com.feedback.exceptions.UserAlreadyExistException;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -17,7 +16,6 @@ import com.feedback.repo.entity.FeedbackRequest;
 import com.feedback.repo.entity.Question;
 import com.feedback.repo.entity.Role;
 import com.feedback.repo.entity.User;
-import org.hashids.Hashids;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,15 +27,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.feedback.dto.UserDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -108,33 +102,6 @@ class UserServiceImplTest {
         User user = userService.findByEmail("student@mail.com").orElse(null);
         assertEquals(student(), user);
         verify(userRepo).findUserByEmail("student@mail.com");
-    }
-
-    @Test
-    void testRegister() {
-        UserDto userDto = userDto();
-        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepo.saveAndFlush(any())).thenReturn(UserDto.map(userDto, "12123"));
-        when(passwordEncoder.encode(anyString())).thenReturn("12123");
-        doNothing().when(emailSenderService).sendEmail(any(SimpleMailMessage.class));
-        UserDto result = userService.register(userDto);
-        userDto.setPassword(null);
-        assertEquals(result, userDto);
-        verify(userRepo, times(1)).findUserByEmail(anyString());
-        verify(userRepo, times(1)).saveAndFlush(any());
-        verify(passwordEncoder, times(1)).encode(anyString());
-        verify(emailSenderService, times(1)).sendEmail(any(SimpleMailMessage.class));
-    }
-
-    @Test
-    void testRegisterNegativeCase() {
-        UserDto userDto = userDto();
-        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(UserDto.map(userDto, "12123")));
-        assertThrows(UserAlreadyExistException.class, () -> userService.register(userDto));
-        verify(userRepo, times(1)).findUserByEmail(anyString());
-        verify(userRepo, times(0)).saveAndFlush(any());
-        verify(passwordEncoder, times(0)).encode(anyString());
-        verify(emailSenderService, times(0)).sendEmail(any(SimpleMailMessage.class));
     }
 
     @Test

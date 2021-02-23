@@ -4,7 +4,7 @@ import com.feedback.config.security.JwtTokenProvider;
 import com.feedback.dto.UserAuthenticationDto;
 import com.feedback.dto.UserDto;
 import com.feedback.repo.entity.User;
-import com.feedback.service.UserService;
+import com.feedback.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,13 +23,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-public class UserAuthenticationController {
+public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final AuthenticationService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public UserAuthenticationController(AuthenticationManager authenticationManager, UserService userService, JwtTokenProvider jwtTokenProvider) {
+    public AuthenticationController(AuthenticationManager authenticationManager, AuthenticationService userService, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;

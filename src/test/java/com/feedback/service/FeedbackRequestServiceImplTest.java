@@ -1,10 +1,12 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
+import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
 import com.feedback.repo.entity.Feedback;
 import com.feedback.repo.entity.FeedbackAnswers;
@@ -50,6 +52,10 @@ class FeedbackRequestServiceImplTest {
     private FeedbackRepo feedbackRepo;
     @Mock
     private FeedbackAnswersRepo feedbackAnswersRepo;
+    @Mock
+    private UserRepo userRepo;
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private FeedbackRequestServiceImpl feedbackRequestService;
@@ -61,7 +67,7 @@ class FeedbackRequestServiceImplTest {
 
     @AfterEach
     public void tearDown() {
-        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo);
+        verifyNoMoreInteractions(feedbackRequestRepo, feedbackAnswersRepo, courseRepo, userRepo);
     }
 
     @Test
@@ -211,6 +217,20 @@ class FeedbackRequestServiceImplTest {
         verify(feedbackAnswersRepo, times(0)).delete(feedbackAnswers());
     }
 
+    @Test
+    void testRemindUsersWithoutFeedback() {
+        when(feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(1L, 1L))
+                .thenReturn(List.of(feedback()));
+        when(userRepo.findByIdIn(Set.of(100L))).thenReturn(Set.of(user()));
+        doNothing().when(userService).sendQuestionnaire(user());
+        Set<UserDto> userSet = feedbackRequestService.remindUsersWithoutFeedback(1L, 1L);
+        assertEquals(Set.of(UserDto.map(user())), userSet);
+        verify(feedbackRepo).findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(1L, 1L);
+        verify(userRepo).findByIdIn(Set.of(100L));
+        verify(userService).sendQuestionnaire(user());
+
+    }
+
     private Set<User> setOfUsers() {
         return Set.of(
                 User.builder()
@@ -230,6 +250,17 @@ class FeedbackRequestServiceImplTest {
                         .password("password")
                         .build()
         );
+    }
+
+    private User user() {
+        return User.builder()
+                .id(100L)
+                .firstName("FirstUserName")
+                .lastName("FirstLastName")
+                .email("single@mail.com")
+                .role(Role.USER)
+                .password("12345")
+                .build();
     }
 
     private Course course() {
@@ -287,7 +318,7 @@ class FeedbackRequestServiceImplTest {
         List<Feedback> feedbackList = new ArrayList<>();
         userSet.forEach(user -> {
             feedbackList.add(Feedback.builder()
-                    .submitted(false)
+                    .submitted(true)
                     .courseId(1L)
                     .feedbackRequestId(1L)
                     .userId(user.getId())
@@ -295,6 +326,16 @@ class FeedbackRequestServiceImplTest {
                     .build());
         });
         return feedbackList;
+    }
+
+    private Feedback feedback() {
+        return Feedback.builder()
+                .active(true)
+                .courseId(1L)
+                .feedbackRequestId(1L)
+                .userId(100L)
+                .answers(feedbackAnswersDB().getAnswers())
+                .build();
     }
 
 }
