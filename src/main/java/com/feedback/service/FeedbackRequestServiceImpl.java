@@ -71,7 +71,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
                             .answers(new LinkedHashSet<>())
                             .build()
             );
-            log.info("Creating feedback request for course{}", courseId);
+            log.info("Creating feedback request for course {}", courseId);
             return map(feedbackRequest);
         } else {
             return null;
@@ -80,7 +80,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
 
     @Override
     public List<FeedbackRequestDto> getFeedbackRequestList(Long courseId) {
-        log.info("Receiving list of feedback requests by course id{}", courseId);
+        log.info("Receiving list of feedback requests by course id {}", courseId);
         return feedbackRequestRepo.findByCourseIdOrderByIdDesc(courseId)
                 .stream().map(FeedbackRequestDto::map).collect(Collectors.toList());
     }
@@ -91,7 +91,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         if (feedbackRequest.isPresent() && feedbackRequest.get().getCourse().getId().equals(courseId)) {
             return map(feedbackRequest.get());
         }
-        log.info("Receiving feedback request by id{} for course{}", feedbackRequestId, courseId);
+        log.info("Receiving feedback request by id {} for course {}", feedbackRequestId, courseId);
         return null;
     }
 
@@ -118,7 +118,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             feedbackRequest.get().setActive(switcherDto.isActive());
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
-        log.info("Activating feedback request{} for course{}", feedbackRequestId, courseId);
+        log.info("Activating feedback request {} for course {}", feedbackRequestId, courseId);
         return null;
     }
 
@@ -134,7 +134,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             feedbackRepo.saveAll(feedbackList);
             return map(feedbackRequestRepo.save(feedbackRequest.get()));
         }
-        log.info("Finishing feedback request{} for course{}", feedbackRequestId, courseId);
+        log.info("Finishing feedback request {} for course {}", feedbackRequestId, courseId);
         return null;
     }
 
@@ -153,7 +153,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
             }
             return new ResponseEntity<>("REMOVED", HttpStatus.NO_CONTENT);
         }
-        log.info("Deleting feedback request{} for course{}", feedbackRequestId, courseId);
+        log.info("Deleting feedback request {} for course {}", feedbackRequestId, courseId);
         return new ResponseEntity<>("WRONG PARAMETERS", HttpStatus.BAD_REQUEST);
     }
 
@@ -174,7 +174,7 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
                 .stream().map(Feedback::getUserId).collect(Collectors.toSet());
         Set<User> userSet = userRepo.findByIdIn(userIdSet);
         userSet.forEach(userService::sendQuestionnaire);
-        log.info("Reminding users from course{} about feedback request{}", courseId, feedbackRequestId);
+        log.info("Reminding users from course{} about feedback request {}", courseId, feedbackRequestId);
         return userSet.stream().map(UserDto::map).collect(Collectors.toSet());
     }
 }

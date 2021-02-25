@@ -47,7 +47,7 @@ public class AnswerServiceImpl implements AnswerService {
             feedbackAnswersRepo.save(feedbackAnswers);
             return answer;
         }
-        log.info("Creating answer{} for course {} and feedback request {}", answer, courseId, feedbackRequestId);
+        log.info("Creating answer {} for course {} and feedback request {}", answer, courseId, feedbackRequestId);
         return null;
     }
 
@@ -67,7 +67,7 @@ public class AnswerServiceImpl implements AnswerService {
                                 .build()).collect(Collectors.toCollection(LinkedHashSet::new));
             }
         }
-        log.info("Receiving answers for course{} BY feedback request id{}", courseId, feedbackRequestId);
+        log.info("Receiving answers for course {} BY feedback request id {}", courseId, feedbackRequestId);
         return Collections.emptySet();
     }
 
@@ -79,12 +79,12 @@ public class AnswerServiceImpl implements AnswerService {
             feedbackAnswers.getAnswers().removeIf(a -> a.equals(answerToRemove));
             return feedbackAnswersRepo.save(feedbackAnswers).getAnswers();
         }
-        log.info("Deleting answer{} for course{} and feedback request{}", answerToRemove, courseId, feedbackRequestId);
+        log.info("Deleting answer {} for course {} and feedback request {}", answerToRemove, courseId, feedbackRequestId);
         return Collections.emptySet();
     }
 
     private boolean isValidRequestParams(Long courseId, FeedbackRequest feedbackRequest) {
-        log.info("Checking if the feedbackRequest{} equals courseId{}", feedbackRequest, courseId);
+        log.info("Checking if the feedbackRequest {} equals courseId {}", feedbackRequest, courseId);
         return feedbackRequest != null && feedbackRequest.getCourse().getId().equals(courseId);
     }
 }

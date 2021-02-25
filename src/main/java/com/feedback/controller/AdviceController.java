@@ -17,7 +17,6 @@ public class AdviceController {
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = {CourseNotFoundException.class})
     public AdviceModel courseNotFound(CourseNotFoundException e) {
-        log.error("Course not found");
         return AdviceModel.builder().status(HttpStatus.NOT_FOUND).message(e.getMessage()).build();
     }
 
