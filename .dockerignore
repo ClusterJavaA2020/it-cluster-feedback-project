@@ -1,19 +1,20 @@
 
 
-Dockerfile
-.dockerignore
-docker-compose.yml
+**/Dockerfile
+**/.dockerignore
+**/docker-compose.yml
 
 
 /.idea
 
 
+**/.github
 .git
 .firebase
 .editorconfig
 
 /e2e
 /docs
-.gitignore
+**/.gitignore
 *.zip
 *.md
