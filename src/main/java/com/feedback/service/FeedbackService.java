@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.entity.Feedback;
@@ -17,4 +18,7 @@ public interface FeedbackService {
 
     List<Feedback> getAllByFeedbackRequestId(int id);
 
+    FeedbackCounterDto getFeedbackCounterForUser(Long userId, Long courseId);
+
+    FeedbackCounterDto getFeedbackCounterForAdmin(Long courseId);
 }

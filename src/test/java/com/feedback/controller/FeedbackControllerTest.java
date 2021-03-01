@@ -3,6 +3,7 @@ package com.feedback.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.BriefUserDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.service.FeedbackService;
@@ -92,6 +93,32 @@ class FeedbackControllerTest {
 
     }
 
+    @WithMockUser
+    @Test
+    void testGetFeedbackCounterForUser() throws Exception {
+        when(feedbackService.getFeedbackCounterForUser(1L, 14L)).thenReturn(feedbackCounterDto());
+        MvcResult mvcResult = mockMvc
+                .perform(get("/users/1/courses/14/feedback-counter")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(feedbackService).getFeedbackCounterForUser(1L, 14L);
+    }
+
+    @WithMockUser
+    @Test
+    void testGetFeedbackCounterForAdmin() throws Exception {
+        when(feedbackService.getFeedbackCounterForAdmin(14L)).thenReturn(feedbackCounterDto());
+        MvcResult mvcResult = mockMvc
+                .perform(get("/courses/14/feedback-counter")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(feedbackService).getFeedbackCounterForAdmin(14L);
+    }
+
     private FeedbackDto feedbackDto() {
         return FeedbackDto.builder()
                 .id("601f237b7523466d6ee03e43")
@@ -117,5 +144,14 @@ class FeedbackControllerTest {
                         .question("Some question")
                         .rate(10)
                         .build());
+    }
+
+    private FeedbackCounterDto feedbackCounterDto() {
+        return FeedbackCounterDto.builder()
+                .newFeedback(1)
+                .activeFeedback(5)
+                .allFeedback(2)
+                .notSubmittedFeedback(4)
+                .build();
     }
 }

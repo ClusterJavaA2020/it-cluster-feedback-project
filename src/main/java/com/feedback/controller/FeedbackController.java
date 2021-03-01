@@ -1,6 +1,7 @@
 package com.feedback.controller;
 
 import com.feedback.dto.AnswerDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.entity.Feedback;
@@ -47,5 +48,15 @@ public class FeedbackController {
     @GetMapping("/feedback/{id}")
     public List<Feedback> getAllByFeedbackRequestId(@PathVariable int id) {
         return feedbackService.getAllByFeedbackRequestId(id);
+    }
+
+    @GetMapping("/users/{userId}/courses/{courseId}/feedback-counter")
+    public FeedbackCounterDto getFeedbackCounterForUser(@PathVariable Long userId, @PathVariable Long courseId) {
+        return feedbackService.getFeedbackCounterForUser(userId, courseId);
+    }
+
+    @GetMapping("/courses/{courseId}/feedback-counter")
+    public FeedbackCounterDto getFeedbackCounterForAdmin(@PathVariable Long courseId) {
+        return feedbackService.getFeedbackCounterForAdmin(courseId);
     }
 }

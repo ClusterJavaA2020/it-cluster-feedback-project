@@ -19,4 +19,5 @@ public interface FeedbackRepo extends MongoRepository<Feedback, String> {
 
     List<Feedback> findAllByFeedbackRequestId(int id);
 
+    List<Feedback> findByCourseId(Long courseId);
 }

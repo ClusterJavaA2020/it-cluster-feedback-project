@@ -111,4 +111,10 @@ public class UserServiceImpl implements UserService {
         emailSenderService.sendEmail(simpleMailMessage);
     }
 
+    @Override
+    public List<UserDto> getAllUsers() {
+        return userRepo.findAll().stream().map(UserDto::map)
+                .sorted(Comparator.comparing(UserDto::getLastName))
+                .collect(Collectors.toList());
+    }
 }

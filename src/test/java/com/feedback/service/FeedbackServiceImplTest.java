@@ -2,6 +2,7 @@ package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.BriefUserDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
@@ -123,6 +124,22 @@ class FeedbackServiceImplTest {
         verify(feedbackRepo, times(0)).save(any());
     }
 
+    @Test
+    void testGetFeedbackCounterForUser() {
+        when(feedbackRepo.findByUserIdAndCourseId(2L, 3L)).thenReturn(List.of(feedback()));
+        FeedbackCounterDto result = feedbackService.getFeedbackCounterForUser(2L, 3L);
+        assertEquals(counter(), result);
+        verify(feedbackRepo).findByUserIdAndCourseId(2L, 3L);
+    }
+
+    @Test
+    void testGetFeedbackCounterForAdmin() {
+        when(feedbackRepo.findByCourseId(3L)).thenReturn(List.of(feedback()));
+        FeedbackCounterDto result = feedbackService.getFeedbackCounterForAdmin(3L);
+        assertEquals(counter(), result);
+        verify(feedbackRepo).findByCourseId(3L);
+    }
+
     private FeedbackRequest feedbackRequest() {
         return FeedbackRequest.builder()
                 .id(4L)
@@ -195,5 +212,14 @@ class FeedbackServiceImplTest {
                         teacher()),
                 setOf(feedbackRequest()),
                 setOf(question())).get(0);
+    }
+
+    private FeedbackCounterDto counter() {
+        return FeedbackCounterDto.builder()
+                .newFeedback(0)
+                .activeFeedback(1)
+                .allFeedback(1)
+                .notSubmittedFeedback(0)
+                .build();
     }
 }
