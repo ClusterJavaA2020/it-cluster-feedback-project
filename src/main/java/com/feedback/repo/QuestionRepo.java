@@ -19,7 +19,7 @@ public interface QuestionRepo extends JpaRepository<Question, Long> {
     Set<Question> findByIdIn(Set<Long> idSet);
 
     @Modifying
-    @Query(value = "UPDATE questions SET is_pattern = :isPattern where id = :id", nativeQuery = true)
+    @Query(value = "UPDATE questions SET pattern = :pattern where id = :id", nativeQuery = true)
     @Transactional
-    void togglePattern(boolean isPattern, Long id);
+    void togglePattern(boolean pattern, Long id);
 }

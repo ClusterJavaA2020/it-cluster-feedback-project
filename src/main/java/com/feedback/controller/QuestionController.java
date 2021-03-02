@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
@@ -40,12 +41,14 @@ public class QuestionController {
     public Question getQuestionById(@PathVariable Long questionId) {
         return questionService.getQuestionById(questionId);
     }
+
     @PostMapping
     public Question addQuestion(@RequestBody QuestionDto questionDto) {
         return questionService.addQuestion(questionDto);
     }
+
     @PostMapping("/{id}/pattern")
     public boolean isPattern(@RequestBody SwitcherDto switcherDto, @PathVariable Long id) {
-        return questionService.togglePattern(switcherDto.isActive(),id);
+        return questionService.togglePattern(switcherDto.isActive(), id);
     }
 }

@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.FeedbackRequestDto;
+import com.feedback.dto.UserDto;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.FeedbackAnswersRepo;
 import com.feedback.repo.FeedbackRepo;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.feedback.dto.FeedbackRequestDto.map;
@@ -168,5 +170,14 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
                 feedbackRequestRepo.save(v);
             }
         });
+    }
+
+    @Override
+    public Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId) {
+        Set<Long> userIdSet = feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(courseId, feedbackRequestId)
+                .stream().map(Feedback::getUserId).collect(Collectors.toSet());
+        Set<User> userSet = userRepo.findByIdIn(userIdSet);
+        userSet.forEach(userService::sendQuestionnaire);
+        return userSet.stream().map(UserDto::map).collect(Collectors.toSet());
     }
 }
