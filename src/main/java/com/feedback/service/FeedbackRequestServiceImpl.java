@@ -163,9 +163,9 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     @Override
     @Scheduled(fixedDelay = day)
     public void finishedFeedbackRequests() {
-        List<FeedbackRequest> unFinishedFeedbackRequests =  feedbackRequestRepo.findByActiveTrueAndFinishedFalse();
-        unFinishedFeedbackRequests.forEach(v->{
-            if (v.getEndDate().equals(LocalDate.now())){
+        List<FeedbackRequest> unFinishedFeedbackRequests = feedbackRequestRepo.findByActiveTrueAndFinishedFalse();
+        unFinishedFeedbackRequests.forEach(v -> {
+            if (v.getEndDate().equals(LocalDate.now())) {
                 v.setFinished(true);
                 feedbackRequestRepo.save(v);
             }
