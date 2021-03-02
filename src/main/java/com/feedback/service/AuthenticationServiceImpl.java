@@ -59,15 +59,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailSenderService.sendEmail(simpleMailMessage);
     }
 
-    @Override
-    public void sendQuestionnaire(User user) {
-        final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(user.getEmail());
-        simpleMailMessage.setSubject("form");
-        simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
-        //user page is in process
-        simpleMailMessage.setText("please respond on a small questionnaire " + "http://localhost:8080/api/auth/findUserById/" + user.getId());
-        emailSenderService.sendEmail(simpleMailMessage);
-    }
-
 }

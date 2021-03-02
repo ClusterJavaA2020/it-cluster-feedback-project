@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface AuthenticationService {
     UserDto register(UserDto userDto);
+
     Optional<User> findByEmail(String email);
+
     void confirmEmail(String id);
-    void sendQuestionnaire(User user);
 }
