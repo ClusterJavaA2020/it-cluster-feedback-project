@@ -69,12 +69,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
         InetAddress inetAddress = InetAddress.getLocalHost();
-        //System.out.println("IP Address:- " + inetAddress.getHostAddress());
-        System.out.println("IP Address:- " + inetAddress.getLocalHost());
+        System.out.println("IP Address:- " + inetAddress.getHostAddress());
+        //System.out.println("IP Address:- " + inetAddress.getLocalHost());
 
 
-        //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getHostAddress() + "/api/auth/register/confirm/" + id);
-        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getLocalHost() + "/api/auth/register/confirm/" + id);
+        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getHostAddress() + "/api/auth/register/confirm/" + id);
+        //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getLocalHost() + "/api/auth/register/confirm/" + id);
         //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://feedback-server:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
     }
