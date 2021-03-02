@@ -103,22 +103,22 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
-    public FeedbackCounterDto getFeedbackCounterForUser(Long userId, Long courseId) {
+    public FeedbackCounterDto getCounterForUser(Long userId, Long courseId) {
         List<Feedback> feedbackList = feedbackRepo.findByUserIdAndCourseId(userId, courseId);
         return FeedbackCounterDto.builder()
-                .allFeedback(feedbackList.size())
-                .activeFeedback((int) feedbackList.stream().filter(f -> f.isActive() && f.isSubmitted()).count())
-                .newFeedback((int) feedbackList.stream().filter(f -> f.isActive() && !f.isSubmitted()).count())
+                .allFeedback((long) feedbackList.size())
+                .activeFeedback(feedbackList.stream().filter(f -> f.isActive() && f.isSubmitted()).count())
+                .newFeedback(feedbackList.stream().filter(f -> f.isActive() && !f.isSubmitted()).count())
                 .build();
     }
 
     @Override
-    public FeedbackCounterDto getFeedbackCounterForAdmin(Long courseId) {
+    public FeedbackCounterDto getCounterForAdmin(Long courseId) {
         List<Feedback> feedbackList = feedbackRepo.findByCourseId(courseId);
         return FeedbackCounterDto.builder()
-                .allFeedback(feedbackList.size())
-                .activeFeedback((int) feedbackList.stream().filter(Feedback::isActive).count())
-                .notSubmittedFeedback((int) feedbackList.stream().filter(f -> !f.isSubmitted() && f.isActive()).count())
+                .allFeedback((long) feedbackList.size())
+                .activeFeedback(feedbackList.stream().filter(Feedback::isActive).count())
+                .notSubmittedFeedback(feedbackList.stream().filter(f -> !f.isSubmitted() && f.isActive()).count())
                 .build();
     }
 

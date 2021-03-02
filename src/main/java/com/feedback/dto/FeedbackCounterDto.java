@@ -1,5 +1,6 @@
 package com.feedback.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,8 +9,10 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class FeedbackCounterDto {
-    private int allFeedback;
-    private int activeFeedback;
-    private int newFeedback;
-    private int notSubmittedFeedback;
+    private Long allFeedback;
+    private Long activeFeedback;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long newFeedback;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long notSubmittedFeedback;
 }

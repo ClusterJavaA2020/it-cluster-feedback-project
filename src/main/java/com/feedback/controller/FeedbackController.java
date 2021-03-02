@@ -50,13 +50,13 @@ public class FeedbackController {
         return feedbackService.getAllByFeedbackRequestId(id);
     }
 
-    @GetMapping("/users/{userId}/courses/{courseId}/feedback-counter")
-    public FeedbackCounterDto getFeedbackCounterForUser(@PathVariable Long userId, @PathVariable Long courseId) {
-        return feedbackService.getFeedbackCounterForUser(userId, courseId);
+    @GetMapping("/users/{userId}/courses/{courseId}/counter")
+    public FeedbackCounterDto getCounterForUser(@PathVariable Long userId, @PathVariable Long courseId) {
+        return feedbackService.getCounterForUser(userId, courseId);
     }
 
-    @GetMapping("/courses/{courseId}/feedback-counter")
-    public FeedbackCounterDto getFeedbackCounterForAdmin(@PathVariable Long courseId) {
-        return feedbackService.getFeedbackCounterForAdmin(courseId);
+    @GetMapping("/courses/{courseId}/counter")
+    public FeedbackCounterDto getCounterForAdmin(@PathVariable Long courseId) {
+        return feedbackService.getCounterForAdmin(courseId);
     }
 }

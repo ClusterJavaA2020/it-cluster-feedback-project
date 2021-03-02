@@ -18,7 +18,7 @@ public interface FeedbackService {
 
     List<Feedback> getAllByFeedbackRequestId(int id);
 
-    FeedbackCounterDto getFeedbackCounterForUser(Long userId, Long courseId);
+    FeedbackCounterDto getCounterForUser(Long userId, Long courseId);
 
-    FeedbackCounterDto getFeedbackCounterForAdmin(Long courseId);
+    FeedbackCounterDto getCounterForAdmin(Long courseId);
 }

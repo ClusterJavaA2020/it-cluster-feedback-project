@@ -96,36 +96,33 @@ class FeedbackControllerTest {
     @WithMockUser
     @Test
     void testGetFeedbackCounterForUser() throws Exception {
-        when(feedbackService.getFeedbackCounterForUser(1L, 14L)).thenReturn(feedbackCounterDto());
+        when(feedbackService.getCounterForUser(1L, 14L)).thenReturn(feedbackCounterDto());
         MvcResult mvcResult = mockMvc
-                .perform(get("/users/1/courses/14/feedback-counter")
+                .perform(get("/users/1/courses/14/counter")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        verify(feedbackService).getFeedbackCounterForUser(1L, 14L);
+        verify(feedbackService).getCounterForUser(1L, 14L);
     }
 
     @WithMockUser
     @Test
     void testGetFeedbackCounterForAdmin() throws Exception {
-        when(feedbackService.getFeedbackCounterForAdmin(14L)).thenReturn(feedbackCounterDto());
+        when(feedbackService.getCounterForAdmin(14L)).thenReturn(feedbackCounterDto());
         MvcResult mvcResult = mockMvc
-                .perform(get("/courses/14/feedback-counter")
+                .perform(get("/courses/14/counter")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status()
                         .isOk())
                 .andReturn();
-        verify(feedbackService).getFeedbackCounterForAdmin(14L);
+        verify(feedbackService).getCounterForAdmin(14L);
     }
 
     private FeedbackDto feedbackDto() {
         return FeedbackDto.builder()
                 .id("601f237b7523466d6ee03e43")
                 .courseId(14L)
-//                .feedbackRequest(FeedbackRequestDto.builder()
-//                        .id(3L)
-//                        .build())
                 .build();
     }
 
@@ -148,10 +145,10 @@ class FeedbackControllerTest {
 
     private FeedbackCounterDto feedbackCounterDto() {
         return FeedbackCounterDto.builder()
-                .newFeedback(1)
-                .activeFeedback(5)
-                .allFeedback(2)
-                .notSubmittedFeedback(4)
+                .newFeedback(1L)
+                .activeFeedback(5L)
+                .allFeedback(2L)
+                .notSubmittedFeedback(4L)
                 .build();
     }
 }

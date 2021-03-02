@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -127,16 +126,16 @@ class FeedbackServiceImplTest {
     @Test
     void testGetFeedbackCounterForUser() {
         when(feedbackRepo.findByUserIdAndCourseId(2L, 3L)).thenReturn(List.of(feedback()));
-        FeedbackCounterDto result = feedbackService.getFeedbackCounterForUser(2L, 3L);
-        assertEquals(counter(), result);
+        FeedbackCounterDto result = feedbackService.getCounterForUser(2L, 3L);
+        assertEquals(counterDtoForUser(), result);
         verify(feedbackRepo).findByUserIdAndCourseId(2L, 3L);
     }
 
     @Test
     void testGetFeedbackCounterForAdmin() {
         when(feedbackRepo.findByCourseId(3L)).thenReturn(List.of(feedback()));
-        FeedbackCounterDto result = feedbackService.getFeedbackCounterForAdmin(3L);
-        assertEquals(counter(), result);
+        FeedbackCounterDto result = feedbackService.getCounterForAdmin(3L);
+        assertEquals(counterDtoForAdmin(), result);
         verify(feedbackRepo).findByCourseId(3L);
     }
 
@@ -214,12 +213,19 @@ class FeedbackServiceImplTest {
                 setOf(question())).get(0);
     }
 
-    private FeedbackCounterDto counter() {
+    private FeedbackCounterDto counterDtoForUser() {
         return FeedbackCounterDto.builder()
-                .newFeedback(0)
-                .activeFeedback(1)
-                .allFeedback(1)
-                .notSubmittedFeedback(0)
+                .newFeedback(0L)
+                .activeFeedback(1L)
+                .allFeedback(1L)
+                .build();
+    }
+
+    private FeedbackCounterDto counterDtoForAdmin() {
+        return FeedbackCounterDto.builder()
+                .activeFeedback(1L)
+                .allFeedback(1L)
+                .notSubmittedFeedback(0L)
                 .build();
     }
 }
