@@ -5,6 +5,7 @@ import com.feedback.dto.BriefUserDto;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -27,10 +28,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.feedback.dto.UserDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -64,6 +68,41 @@ class UserServiceImplTest {
     @AfterEach
     public void tearDown() {
         verifyNoMoreInteractions(feedbackRepo, feedbackRequestRepo, questionRepo, userRepo);
+    }
+
+    @Test
+    void testUpdateUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(user()));
+        when(userRepo.save(map(userDto(), (userDto().getPassword())))).thenReturn(user());
+        UserDto userDto = userService.update(map(user()));
+        assertNotNull(userDto);
+        assertEquals(map(user()), userDto);
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(1)).save(map(userDto(), (userDto().getPassword())));
+    }
+
+    @Test
+    void testUpdateNotExistingUser() throws UserNotFoundException {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.update(map(user())));
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(0)).save(map(userDto(), (userDto().getPassword())));
+    }
+
+    @Test
+    void testDeleteUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(user()));
+        userService.delete(userDto().getEmail());
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(1)).deleteById(user().getId());
+    }
+
+    @Test
+    void testDeleteNotExistingUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.delete(userDto().getEmail()));
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(0)).deleteById(user().getId());
     }
 
     @Test
@@ -120,6 +159,18 @@ class UserServiceImplTest {
                 .password("12123")
                 .phoneNumber("+380")
                 .role("USER")
+                .build();
+    }
+
+    private User user() {
+        return User.builder()
+                .id(1L)
+                .email("some@example.com")
+                .firstName("Some")
+                .lastName("One")
+                .password("12123")
+                .phoneNumber("+380")
+                .role(Role.USER)
                 .build();
     }
 

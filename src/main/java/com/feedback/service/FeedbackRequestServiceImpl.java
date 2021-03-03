@@ -152,11 +152,11 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
     @Override
     @Scheduled(fixedDelay = day)
     public void reminder() {
-        feedbackRepo.findByActiveTrueAndSubmittedFalse()
+        /*feedbackRepo.findByActiveTrueAndSubmittedFalse()
                 .stream().map(Feedback::getUserId).forEach(userId -> {
             Optional<User> user = userRepo.findById(userId);
             user.ifPresent(userService::sendQuestionnaire);
-        });
+        });*/
     }
 
     @Override
