@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class FeedbackCounterDto {
-    private Long allFeedback;
+    private Integer allFeedback;
     private Long activeFeedback;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long newFeedback;

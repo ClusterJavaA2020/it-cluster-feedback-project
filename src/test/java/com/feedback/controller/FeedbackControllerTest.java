@@ -147,7 +147,7 @@ class FeedbackControllerTest {
         return FeedbackCounterDto.builder()
                 .newFeedback(1L)
                 .activeFeedback(5L)
-                .allFeedback(2L)
+                .allFeedback(2)
                 .notSubmittedFeedback(4L)
                 .build();
     }

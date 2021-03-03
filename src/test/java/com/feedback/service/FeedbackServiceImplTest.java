@@ -217,14 +217,14 @@ class FeedbackServiceImplTest {
         return FeedbackCounterDto.builder()
                 .newFeedback(0L)
                 .activeFeedback(1L)
-                .allFeedback(1L)
+                .allFeedback(1)
                 .build();
     }
 
     private FeedbackCounterDto counterDtoForAdmin() {
         return FeedbackCounterDto.builder()
                 .activeFeedback(1L)
-                .allFeedback(1L)
+                .allFeedback(1)
                 .notSubmittedFeedback(0L)
                 .build();
     }

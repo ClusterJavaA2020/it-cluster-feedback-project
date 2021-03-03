@@ -106,7 +106,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     public FeedbackCounterDto getCounterForUser(Long userId, Long courseId) {
         List<Feedback> feedbackList = feedbackRepo.findByUserIdAndCourseId(userId, courseId);
         return FeedbackCounterDto.builder()
-                .allFeedback((long) feedbackList.size())
+                .allFeedback(feedbackList.size())
                 .activeFeedback(feedbackList.stream().filter(f -> f.isActive() && f.isSubmitted()).count())
                 .newFeedback(feedbackList.stream().filter(f -> f.isActive() && !f.isSubmitted()).count())
                 .build();
@@ -116,7 +116,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     public FeedbackCounterDto getCounterForAdmin(Long courseId) {
         List<Feedback> feedbackList = feedbackRepo.findByCourseId(courseId);
         return FeedbackCounterDto.builder()
-                .allFeedback((long) feedbackList.size())
+                .allFeedback(feedbackList.size())
                 .activeFeedback(feedbackList.stream().filter(Feedback::isActive).count())
                 .notSubmittedFeedback(feedbackList.stream().filter(f -> !f.isSubmitted() && f.isActive()).count())
                 .build();
