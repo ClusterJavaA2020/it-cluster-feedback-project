@@ -1,5 +1,7 @@
 package com.feedback.service;
 
+//Uncomment for AWS
+//import com.amazonaws.util.EC2MetadataUtils;
 import com.feedback.dto.UserDto;
 import com.feedback.exceptions.UserAlreadyExistException;
 import com.feedback.exceptions.UserNotFoundException;
@@ -65,17 +67,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         simpleMailMessage.setSubject("You are almost registered!");
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
 
-
-
-
+        /*
+         * Comment for AWS
+         * */
         InetAddress inetAddress = InetAddress.getLocalHost();
         System.out.println("IP Address:- " + inetAddress.getHostAddress());
-        //System.out.println("IP Address:- " + inetAddress.getLocalHost());
+        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getHostAddress() + ":8080/api/auth/register/confirm/" + id);
 
+        /*
+        * add to pom.xml
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.11.965</version>
+		</dependency>
+		*
+		* Uncomment for AWS
+        * */
+        //EC2MetadataUtils.getData("/latest/meta-data/public-ipv4");
+        //System.out.println("IP Address:- " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4"));
+        //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4") + ":8080/api/auth/register/confirm/" + id);
 
-        simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getHostAddress() + "/api/auth/register/confirm/" + id);
-        //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + inetAddress.getLocalHost() + "/api/auth/register/confirm/" + id);
-        //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + "http://feedback-server:8080/api/auth/register/confirm/" + id);
         emailSenderService.sendEmail(simpleMailMessage);
     }
 
@@ -85,14 +98,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         simpleMailMessage.setTo(user.getEmail());
         simpleMailMessage.setSubject("form");
         simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
+
+        /*
+         * Comment for AWS
+         * */
         InetAddress inetAddress = InetAddress.getLocalHost();
         System.out.println("IP Address:- " + inetAddress.getHostAddress());
+        simpleMailMessage.setText("please respond on a small questionnaire " + inetAddress.getHostAddress() + ":8080/api/auth/findUserById/" + user.getId());
 
+        /*
+         * Uncomment for AWS
+         * */
+        //System.out.println("IP Address:- " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4"));
+        //simpleMailMessage.setText("please respond on a small questionnaire " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4") + ":8080/api/auth/findUserById/" + user.getId());
 
-
-        //user page is in process
-        simpleMailMessage.setText("please respond on a small questionnaire " + inetAddress.getHostAddress() + "/api/auth/findUserById/" + user.getId());
-        //simpleMailMessage.setText("please respond on a small questionnaire " + "http://feedback-server:8080/api/auth/findUserById/" + user.getId());
         emailSenderService.sendEmail(simpleMailMessage);
     }
 
