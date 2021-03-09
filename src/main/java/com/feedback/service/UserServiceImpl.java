@@ -48,11 +48,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
+        log.info("Updating user {}",userDto);
         User user = userRepo.findUserByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
-        user.setPhoneNumber(userDto.getEmail());
+        user.setPhoneNumber(userDto.getPhoneNumber());
         user.setRole(Role.valueOf(userDto.getRole()));
         return UserDto.map(userRepo.save(user));
     }
