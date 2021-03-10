@@ -70,17 +70,10 @@ class UserServiceImplTest {
         when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(map(userDto(), "")));
         when(userRepo.save(any(User.class))).thenReturn(new User());
         when(userRepo.findById(2L)).thenReturn(Optional.ofNullable(student()));
-        //when(userService.update(any())).thenReturn((UserDto.map(UserDto.map((userDto()), ""))));
-        //when(userService.update(userDto())).thenReturn(userDto());
-        //UserDto user = userRepo.findById(1L);
-        //UserDto user = userService.update(userDto());
         UserDto user = userService.getUserById(2L);
-        System.out.println(user);
-        //System.out.println(user);
-        //userRepo.findUserByEmail("some@example.com");
         user.setPhoneNumber("967609446");
         userService.update(user);
-        assertEquals( "967609446", user.getPhoneNumber());
+        assertEquals("967609446", user.getPhoneNumber());
         verify(userRepo).findUserByEmail(any());
         verify(userRepo).save(any());
         verify(userRepo).findById(any());
