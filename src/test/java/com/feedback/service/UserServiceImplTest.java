@@ -69,14 +69,12 @@ class UserServiceImplTest {
     void testUpdate() {
         when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(map(userDto(), "")));
         when(userRepo.save(any(User.class))).thenReturn(new User());
-        when(userRepo.findById(2L)).thenReturn(Optional.ofNullable(student()));
-        UserDto user = userService.getUserById(2L);
+        UserDto user = userDto();
         user.setPhoneNumber("967609446");
         userService.update(user);
         assertEquals("967609446", user.getPhoneNumber());
         verify(userRepo).findUserByEmail(any());
         verify(userRepo).save(any());
-        verify(userRepo).findById(any());
     }
 
     @Test
@@ -84,6 +82,7 @@ class UserServiceImplTest {
         when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.update(userDto()));
         verify(userRepo).findUserByEmail(anyString());
+        verify(userRepo, times(0)).save(any());
     }
 
 
