@@ -1,6 +1,7 @@
 package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
@@ -105,6 +106,26 @@ public class FeedbackServiceImpl implements FeedbackService {
     public List<Feedback> getAllByFeedbackRequestId(int id) {
         log.info("Receiving all feedbacks by feedback request id {}", id);
         return feedbackRepo.findAllByFeedbackRequestId(id);
+    }
+
+    @Override
+    public FeedbackCounterDto getCounterForUser(Long userId, Long courseId) {
+        List<Feedback> feedbackList = feedbackRepo.findByUserIdAndCourseId(userId, courseId);
+        return FeedbackCounterDto.builder()
+                .allFeedback(feedbackList.size())
+                .activeFeedback(feedbackList.stream().filter(f -> f.isActive() && f.isSubmitted()).count())
+                .newFeedback(feedbackList.stream().filter(f -> f.isActive() && !f.isSubmitted()).count())
+                .build();
+    }
+
+    @Override
+    public FeedbackCounterDto getCounterForAdmin(Long courseId) {
+        List<Feedback> feedbackList = feedbackRepo.findByCourseId(courseId);
+        return FeedbackCounterDto.builder()
+                .allFeedback(feedbackList.size())
+                .activeFeedback(feedbackList.stream().filter(Feedback::isActive).count())
+                .notSubmittedFeedback(feedbackList.stream().filter(f -> !f.isSubmitted() && f.isActive()).count())
+                .build();
     }
 
 }

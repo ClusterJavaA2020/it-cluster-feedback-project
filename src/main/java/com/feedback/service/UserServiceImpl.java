@@ -120,4 +120,10 @@ public class UserServiceImpl implements UserService {
         log.info("Sending questionnaire to users {} email", user);
     }
 
+    @Override
+    public List<UserDto> getAllUsers() {
+        return userRepo.findAll().stream().map(UserDto::map)
+                .sorted(Comparator.comparing(UserDto::getLastName))
+                .collect(Collectors.toList());
+    }
 }

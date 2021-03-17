@@ -147,6 +147,15 @@ class UserServiceImplTest {
         verify(emailSenderService, times(1)).sendEmail(any());
     }
 
+    @Test
+    void testGetAllUsers() {
+        when(userRepo.findAll()).thenReturn(List.of(student()));
+        List<UserDto> result = userService.getAllUsers();
+        assertEquals(List.of(map(student())), result);
+        verify(userRepo).findAll();
+
+    }
+
     private UserDto userDto() {
         return UserDto.builder()
                 .id(1L)
