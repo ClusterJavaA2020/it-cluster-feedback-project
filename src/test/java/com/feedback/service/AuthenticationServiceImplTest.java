@@ -20,7 +20,6 @@ import java.util.Optional;
 
 import static com.feedback.dto.UserDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,44 +53,12 @@ public class AuthenticationServiceImplTest {
         verifyNoMoreInteractions(userRepo, emailSenderService);
     }
 
-    @Test()
-    public void testRegisterNewUser() {
-        UserDto dto = UserDto.builder()
-                .firstName("test")
-                .lastName("test")
-                .email("test@mail.com")
-                .password("test123")
-                .phoneNumber("+3806602000800")
-                .role(String.valueOf(Role.USER))
-                .build();
-        when(userRepo.findUserByEmail("test@mail.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(any())).thenReturn("test123");
-        when(userRepo.saveAndFlush(map(dto, (dto.getPassword())))).thenReturn(user());
-        UserDto userDto = authenticationService.register(map(user()));
-        assertNotNull(userDto);
-        assertEquals(map(user()), userDto);
-        verify(userRepo, times(1)).findUserByEmail("test@mail.com");
-        verify(userRepo, times(1)).saveAndFlush(map(dto, user().getPassword()));
-        verify(emailSenderService, times(1)).sendEmail(email());
-    }
-
-    @Test(expected = UserAlreadyExistException.class)
-    public void testRegisterExistingUser() throws UserAlreadyExistException {
-        UserDto dto = UserDto.builder()
-                .firstName("test")
-                .lastName("test")
-                .email("test@mail.com")
-                .password("test123")
-                .phoneNumber("+3806602000800")
-                .role(String.valueOf(Role.USER))
-                .build();
-        when(userRepo.findUserByEmail("test@mail.com")).thenReturn(Optional.of(user()));
-        authenticationService.register(dto);
-        User user = userRepo.findUserByEmail("test@mail.com").get();
-        assertNotNull(user);
-        verify(userRepo, times(1)).findUserByEmail("test@mail.com");
-        verify(userRepo, times(0)).saveAndFlush(any());
-        verify(emailSenderService, times(0)).sendEmail(any());
+    @Test
+    public void testFindByEmail() {
+        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(user()));
+        Optional<User> user = authenticationService.findByEmail(anyString());
+        assertEquals(user().getEmail(), user.get().getEmail());
+        verify(userRepo).findUserByEmail(anyString());
     }
 
     @Test
@@ -122,6 +89,24 @@ public class AuthenticationServiceImplTest {
         verify(userRepo, times(1)).findUserByEmail(anyString());
         verify(userRepo, times(0)).saveAndFlush(any());
         verify(emailSenderService, times(0)).sendEmail(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    public void testConfirmEmail() {
+        Hashids hashids = new Hashids("id-secret");
+        String id = hashids.encodeHex(user().getId().toString());
+        when(userRepo.findById(1l)).thenReturn(Optional.ofNullable(user()));
+        when(userRepo.save(user())).thenReturn(user());
+        authenticationService.confirmEmail(id);
+        assertEquals(user().isActive(), false);
+        verify(userRepo, times(1)).findById(user().getId());
+        verify(userRepo, times(1)).save(user());
+    }
+
+    @Test
+    public void testSendQuestionnaire() {
+        emailSenderService.sendEmail(email());
+        verify(emailSenderService, times(1)).sendEmail(email());
     }
 
     private User user() {

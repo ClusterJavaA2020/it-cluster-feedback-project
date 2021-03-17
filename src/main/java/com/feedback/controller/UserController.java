@@ -1,8 +1,11 @@
 package com.feedback.controller;
 
+import com.feedback.config.security.JwtTokenProvider;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.dto.FeedbackDto;
+import com.feedback.exceptions.UserNotFoundException;
+import com.feedback.repo.entity.Role;
 import com.feedback.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping()
-    @PreAuthorize("hasAnyAuthority('user:write','admin:create')")
+    @PreAuthorize("hasAuthority('user:write')")
     public UserDto update(@RequestBody UserDto userDto) {
         return userService.update(userDto);
     }
@@ -50,5 +53,10 @@ public class UserController {
     @GetMapping("{userId}/courses/{courseId}")
     public List<FeedbackDto> getFeedbackByUserIdAndCourseId(@PathVariable Long userId, @PathVariable Long courseId) {
         return userService.getFeedbackByUserIdAndCourseId(userId, courseId);
+    }
+
+    @GetMapping
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
     }
 }

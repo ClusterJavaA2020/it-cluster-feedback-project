@@ -11,4 +11,5 @@ public interface AuthenticationService {
     Optional<User> findByEmail(String email);
 
     void confirmEmail(String id);
+
 }

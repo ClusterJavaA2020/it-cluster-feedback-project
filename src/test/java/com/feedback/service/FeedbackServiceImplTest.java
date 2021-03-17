@@ -2,6 +2,7 @@ package com.feedback.service;
 
 import com.feedback.dto.AnswerDto;
 import com.feedback.dto.BriefUserDto;
+import com.feedback.dto.FeedbackCounterDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
@@ -30,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -123,6 +123,22 @@ class FeedbackServiceImplTest {
         verify(feedbackRepo, times(0)).save(any());
     }
 
+    @Test
+    void testGetFeedbackCounterForUser() {
+        when(feedbackRepo.findByUserIdAndCourseId(2L, 3L)).thenReturn(List.of(feedback()));
+        FeedbackCounterDto result = feedbackService.getCounterForUser(2L, 3L);
+        assertEquals(counterDtoForUser(), result);
+        verify(feedbackRepo).findByUserIdAndCourseId(2L, 3L);
+    }
+
+    @Test
+    void testGetFeedbackCounterForAdmin() {
+        when(feedbackRepo.findByCourseId(3L)).thenReturn(List.of(feedback()));
+        FeedbackCounterDto result = feedbackService.getCounterForAdmin(3L);
+        assertEquals(counterDtoForAdmin(), result);
+        verify(feedbackRepo).findByCourseId(3L);
+    }
+
     private FeedbackRequest feedbackRequest() {
         return FeedbackRequest.builder()
                 .id(4L)
@@ -195,5 +211,21 @@ class FeedbackServiceImplTest {
                         teacher()),
                 setOf(feedbackRequest()),
                 setOf(question())).get(0);
+    }
+
+    private FeedbackCounterDto counterDtoForUser() {
+        return FeedbackCounterDto.builder()
+                .newFeedback(0L)
+                .activeFeedback(1L)
+                .allFeedback(1)
+                .build();
+    }
+
+    private FeedbackCounterDto counterDtoForAdmin() {
+        return FeedbackCounterDto.builder()
+                .activeFeedback(1L)
+                .allFeedback(1)
+                .notSubmittedFeedback(0L)
+                .build();
     }
 }

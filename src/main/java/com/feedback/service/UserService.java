@@ -2,12 +2,10 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.FeedbackDto;
-import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
 import com.feedback.repo.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface UserService {
@@ -22,4 +20,6 @@ public interface UserService {
     List<FeedbackDto> getFeedbackByUserIdAndCourseId(Long userId, Long courseId);
 
     void sendQuestionnaire(User user);
+
+    List<UserDto> getAllUsers();
 }
