@@ -168,6 +168,19 @@ public class FeedbackRequestServiceImpl implements FeedbackRequestService {
         log.info("Sending mail about active feedback request");
     }
 
+
+    @Override
+    @Scheduled(fixedDelay = day)
+    public void finishedFeedbackRequests() {
+        List<FeedbackRequest> unFinishedFeedbackRequests = feedbackRequestRepo.findByActiveTrueAndFinishedFalse();
+        unFinishedFeedbackRequests.forEach(v -> {
+            if (v.getEndDate().equals(LocalDate.now())) {
+                v.setFinished(true);
+                feedbackRequestRepo.save(v);
+            }
+        });
+    }
+
     @Override
     public Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId) {
         Set<Long> userIdSet = feedbackRepo.findByActiveTrueAndSubmittedFalseAndCourseIdAndFeedbackRequestId(courseId, feedbackRequestId)

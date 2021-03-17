@@ -1,3 +1,4 @@
+
 package com.feedback.service;
 
 import com.feedback.dto.UserDto;
@@ -18,12 +19,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Collections;
+import java.util.Optional;
 
 import static com.feedback.dto.FeedbackDto.map;
 
@@ -98,9 +100,11 @@ public class UserServiceImpl implements UserService {
         Set<FeedbackRequest> feedbackRequestSet = feedbackRequestRepo.findByIdIn(feedbackRequestIdSet);
         Set<Question> questionSet = questionRepo.findByIdIn(questionIdSet);
         log.info("Receiving feedback by user id {} and course id {}", userId, courseId);
-        return map(feedbackList, userSet, feedbackRequestSet, questionSet)
-                .stream().sorted(Comparator.comparing(FeedbackDto::getDate).reversed())
+        List<FeedbackDto> result = map(feedbackList, userSet, feedbackRequestSet, questionSet)
+                .stream().sorted(Comparator.comparing(v -> v.getFeedbackRequest().getEndDate()))
                 .collect(Collectors.toList());
+        Collections.reverse(result);
+        return result;
     }
 
     public Optional<User> findByEmail(String email) {

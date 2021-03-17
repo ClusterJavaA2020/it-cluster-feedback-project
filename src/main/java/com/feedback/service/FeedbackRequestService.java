@@ -23,5 +23,7 @@ public interface FeedbackRequestService {
 
     void reminder();
 
+    void finishedFeedbackRequests();
+
     Set<UserDto> remindUsersWithoutFeedback(Long courseId, Long feedbackRequestId);
 }

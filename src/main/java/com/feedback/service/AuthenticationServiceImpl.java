@@ -94,28 +94,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("Sending registration email to user {}", user);
     }
 
-    @Override
-    public void sendQuestionnaire(User user) throws UnknownHostException {
-        final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(user.getEmail());
-        simpleMailMessage.setSubject("form");
-        simpleMailMessage.setFrom("feedbackapplication.mail@gmail.com");
-
-        /*
-         * Comment for AWS
-         * */
-        InetAddress inetAddress = InetAddress.getLocalHost();
-        System.out.println("IP Address:- " + inetAddress.getHostAddress());
-        simpleMailMessage.setText("please respond on a small questionnaire " + inetAddress.getHostAddress() + ":8080/api/auth/findUserById/" + user.getId());
-
-        /*
-         * Uncomment for AWS
-         * */
-        //System.out.println("IP Address:- " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4"));
-        //simpleMailMessage.setText("please respond on a small questionnaire " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4") + ":8080/api/auth/findUserById/" + user.getId());
-
-        emailSenderService.sendEmail(simpleMailMessage);
-        log.info("Sending questionnaire to users {} email", user);
-    }
-
 }

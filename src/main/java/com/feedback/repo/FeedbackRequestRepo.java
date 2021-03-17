@@ -10,4 +10,7 @@ public interface FeedbackRequestRepo extends JpaRepository<FeedbackRequest, Long
     List<FeedbackRequest> findByCourseIdOrderByIdDesc(Long courseId);
 
     Set<FeedbackRequest> findByIdIn(Set<Long> idSet);
+
+    List<FeedbackRequest> findByActiveTrueAndFinishedFalse();
+
 }
