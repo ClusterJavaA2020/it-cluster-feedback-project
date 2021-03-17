@@ -7,6 +7,7 @@ import com.feedback.dto.FeedbackDto;
 import com.feedback.dto.UserDto;
 import com.feedback.exceptions.UserAlreadyExistException;
 import com.feedback.exceptions.UserNotFoundException;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
 import com.feedback.repo.FeedbackRequestRepo;
@@ -26,9 +27,18 @@ import org.mockito.Mock;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.*;
 
 import static com.feedback.dto.UserDto.map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
@@ -66,40 +76,38 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdate() {
-        when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(map(userDto(), "")));
-        when(userRepo.save(any(User.class))).thenReturn(new User());
-        UserDto user = userDto();
-        user.setPhoneNumber("967609446");
-        userService.update(user);
-        assertEquals("967609446", user.getPhoneNumber());
-        verify(userRepo).findUserByEmail(any());
-        verify(userRepo).save(any());
+    void testUpdateUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(user()));
+        when(userRepo.save(map(userDto(), (userDto().getPassword())))).thenReturn(user());
+        UserDto userDto = userService.update(map(user()));
+        assertNotNull(userDto);
+        assertEquals(map(user()), userDto);
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(1)).save(map(userDto(), (userDto().getPassword())));
     }
 
     @Test
-    void testUpdateNegative() {
-        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.update(userDto()));
-        verify(userRepo).findUserByEmail(anyString());
-        verify(userRepo, times(0)).save(any());
-    }
-
-
-    @Test
-    void testDelete() {
-        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(UserDto.map(userDto(), "")));
-        doNothing().when(userRepo).delete(any(User.class));
-        userService.delete("student@mail.com");
-        verify(userRepo).findUserByEmail(anyString());
-        verify(userRepo).deleteById(anyLong());
-    }
-
-    @Test
-    void testDeleteNegative() {
+    void testUpdateNotExistingUser() throws UserNotFoundException {
         when(userRepo.findUserByEmail(any())).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.delete("student@mail.com"));
-        verify(userRepo).findUserByEmail(anyString());
+        assertThrows(UserNotFoundException.class, () -> userService.update(map(user())));
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(0)).save(map(userDto(), (userDto().getPassword())));
+    }
+
+    @Test
+    void testDeleteUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.ofNullable(user()));
+        userService.delete(userDto().getEmail());
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(1)).deleteById(user().getId());
+    }
+
+    @Test
+    void testDeleteNotExistingUser() {
+        when(userRepo.findUserByEmail(any())).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.delete(userDto().getEmail()));
+        verify(userRepo, times(1)).findUserByEmail(any());
+        verify(userRepo, times(0)).deleteById(user().getId());
     }
 
     @Test
@@ -165,6 +173,18 @@ class UserServiceImplTest {
                 .password("12123")
                 .phoneNumber("+380")
                 .role("USER")
+                .build();
+    }
+
+    private User user() {
+        return User.builder()
+                .id(1L)
+                .email("some@example.com")
+                .firstName("Some")
+                .lastName("One")
+                .password("12123")
+                .phoneNumber("+380")
+                .role(Role.USER)
                 .build();
     }
 

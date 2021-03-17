@@ -1,5 +1,6 @@
 package com.feedback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.dto.UserDto;
@@ -23,7 +24,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -44,6 +47,60 @@ class UserControllerTest {
     @AfterEach
     public void tearDown() {
         verifyNoMoreInteractions(userService);
+    }
+
+    @WithMockUser(authorities = "user:write")
+    @Test
+    void testUpdateUser() throws Exception {
+        when(userService.update(userDto())).thenReturn(userDto());
+        MvcResult mvcResult = mockMvc
+                .perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(userDto())
+                        )
+                )
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(userService).update(userDto());
+    }
+
+    @WithMockUser(authorities = "user:read")
+    @Test
+    void testUpdateUserNotEnoughAuthorities() throws Exception {
+        when(userService.update(userDto())).thenReturn(userDto());
+        MvcResult mvcResult = mockMvc
+                .perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(userDto())
+                        )
+                )
+                .andExpect(status()
+                        .isForbidden())
+                .andReturn();
+    }
+
+    @WithMockUser(authorities = "user:write")
+    @Test
+    void testDeleteUserNotEnoughAuthorities() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(delete("/users/someemail@gmail.com")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isForbidden())
+                .andReturn();
+    }
+
+    @WithMockUser(authorities = "admin:create")
+    @Test
+    void testDeleteUser() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(delete("/users/someemail@gmail.com")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(userService).delete(userDto().getEmail());
     }
 
     @WithMockUser
