@@ -1,6 +1,8 @@
 package com.feedback.service;
 
 import com.feedback.dto.QuestionDto;
+import com.feedback.exceptions.QuestionNotFoundException;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.repo.QuestionRepo;
 import com.feedback.repo.entity.Question;
 import org.junit.jupiter.api.AfterEach;
@@ -10,12 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.feedback.dto.QuestionDto.map;
 import static java.util.Optional.ofNullable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -102,6 +103,15 @@ class QuestionServiceImplTest {
         assertTrue(result);
         verify(questionRepo).togglePattern(true, 2L);
         verify(questionRepo).findById(2L);
+    }
+
+    @Test
+    void testTogglePatternNegativeCase() {
+        doNothing().when(questionRepo).togglePattern(true, 2L);
+        when(questionRepo.findById(any())).thenReturn(Optional.empty());
+        assertThrows(QuestionNotFoundException.class, () -> questionService.togglePattern(true, 2l));
+        verify(questionRepo).togglePattern(true, 2L);
+        verify(questionRepo).findById(any());
     }
 
     private List<Question> questions() {
