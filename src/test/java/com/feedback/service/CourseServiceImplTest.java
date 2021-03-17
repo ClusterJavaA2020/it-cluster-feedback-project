@@ -2,6 +2,8 @@ package com.feedback.service;
 
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.CourseNotFoundException;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.repo.CourseRepo;
 import com.feedback.repo.UserRepo;
 import com.feedback.repo.entity.Course;
@@ -23,10 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.feedback.dto.CourseDto.map;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,6 +70,13 @@ class CourseServiceImplTest {
         assertNotNull(result);
         assertEquals(map(course()), result);
         verify(courseRepo).findById(1L);
+    }
+
+    @Test
+    void testGetNegativeCase() {
+        when(courseRepo.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(CourseNotFoundException.class, () -> courseService.get(anyLong()));
+        verify(courseRepo).findById(anyLong());
     }
 
     @Test

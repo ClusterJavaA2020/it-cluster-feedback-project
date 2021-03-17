@@ -16,7 +16,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @Builder
 public class UserDto {
- private Long id;
+    private Long id;
     @NotBlank(message = "Name shouldn't be empty")
     private String firstName;
     @NotBlank(message = "Lastname shouldn't be empty")
@@ -29,7 +29,7 @@ public class UserDto {
     private String phoneNumber;
     private String role;
 
-    public static User map(UserDto userDto,String password){
+    public static User map(UserDto userDto, String password) {
         return User.builder()
                 .id(userDto.getId())
                 .firstName(userDto.getFirstName())
@@ -40,7 +40,8 @@ public class UserDto {
                 .role(Role.valueOf(userDto.getRole()))
                 .build();
     }
-    public static UserDto map(User user){
+
+    public static UserDto map(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())

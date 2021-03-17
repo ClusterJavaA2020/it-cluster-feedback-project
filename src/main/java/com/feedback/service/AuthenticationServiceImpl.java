@@ -1,7 +1,5 @@
 package com.feedback.service;
 
-//Uncomment for AWS
-//import com.amazonaws.util.EC2MetadataUtils;
 import com.feedback.dto.UserDto;
 import com.feedback.exceptions.UserAlreadyExistException;
 import com.feedback.exceptions.UserNotFoundException;
@@ -38,6 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         User user = userRepo.saveAndFlush(UserDto.map(userDto, passwordEncoder.encode(userDto.getPassword())));
+        log.info("Registering new user {}", userDto);
         try {
             sendRegistrationEmail(user);
         } catch (UnknownHostException e) {
@@ -48,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public Optional<User> findByEmail(String email) {
+        log.info("Finding user by email {}", email);
         return userRepo.findUserByEmail(email);
     }
 
@@ -56,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepo.findById(Long.parseLong(hashids.decodeHex(id))).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
         userRepo.save(user);
+        log.info("Confirming users {} email", id);
     }
 
     private void sendRegistrationEmail(User user) throws UnknownHostException {
@@ -90,6 +91,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //simpleMailMessage.setText("Please click on the below link to activate your account. Thank you!" + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4") + ":8080/api/auth/register/confirm/" + id);
 
         emailSenderService.sendEmail(simpleMailMessage);
+        log.info("Sending registration email to user {}", user);
     }
 
     @Override
@@ -113,6 +115,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //simpleMailMessage.setText("please respond on a small questionnaire " + EC2MetadataUtils.getData("/latest/meta-data/public-ipv4") + ":8080/api/auth/findUserById/" + user.getId());
 
         emailSenderService.sendEmail(simpleMailMessage);
+        log.info("Sending questionnaire to users {} email", user);
     }
 
 }

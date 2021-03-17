@@ -26,7 +26,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@EqualsAndHashCode(of ={"email"})
+@EqualsAndHashCode(of = {"email"})
 
 @Entity
 @Table(name = "users")
@@ -42,8 +42,8 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
-   // @Column(nullable = false)
-    private Role role=Role.USER;
+    // @Column(nullable = false)
+    private Role role = Role.USER;
     private boolean active = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
