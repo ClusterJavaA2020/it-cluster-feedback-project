@@ -54,4 +54,9 @@ public class UserController {
     public List<FeedbackDto> getFeedbackByUserIdAndCourseId(@PathVariable Long userId, @PathVariable Long courseId) {
         return userService.getFeedbackByUserIdAndCourseId(userId, courseId);
     }
+
+    @GetMapping
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
+    }
 }

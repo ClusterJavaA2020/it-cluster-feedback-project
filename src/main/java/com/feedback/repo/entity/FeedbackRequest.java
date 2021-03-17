@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor

@@ -142,6 +142,19 @@ class UserControllerTest {
         verify(userService).getFeedbackByUserIdAndCourseId(7L, 3L);
     }
 
+    @WithMockUser
+    @Test
+    void testGetAllUsers() throws Exception {
+        when(userService.getAllUsers()).thenReturn(List.of(userDto()));
+        MvcResult mvcResult = mockMvc
+                .perform(get("/users/")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status()
+                        .isOk())
+                .andReturn();
+        verify(userService).getAllUsers();
+    }
+
     private UserDto userDto() {
         return UserDto.builder()
                 .id(7L)

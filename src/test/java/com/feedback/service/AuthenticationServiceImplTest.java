@@ -54,6 +54,14 @@ public class AuthenticationServiceImplTest {
     }
 
     @Test
+    public void testFindByEmail() {
+        when(userRepo.findUserByEmail(anyString())).thenReturn(Optional.ofNullable(user()));
+        Optional<User> user = authenticationService.findByEmail(anyString());
+        assertEquals(user().getEmail(), user.get().getEmail());
+        verify(userRepo).findUserByEmail(anyString());
+    }
+
+    @Test
     public void testSendRegistrationEmail() {
         emailSenderService.sendEmail(email());
         verify(emailSenderService, times(1)).sendEmail(email());

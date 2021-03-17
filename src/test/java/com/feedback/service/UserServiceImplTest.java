@@ -5,6 +5,8 @@ import com.feedback.dto.BriefUserDto;
 import com.feedback.dto.CourseDto;
 import com.feedback.dto.FeedbackDto;
 import com.feedback.dto.UserDto;
+import com.feedback.exceptions.UserAlreadyExistException;
+import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.exceptions.UserNotFoundException;
 import com.feedback.model.Answer;
 import com.feedback.repo.FeedbackRepo;
@@ -30,12 +32,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.*;
 
 import static com.feedback.dto.UserDto.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -148,6 +153,15 @@ class UserServiceImplTest {
         doNothing().when(emailSenderService).sendEmail(any(SimpleMailMessage.class));
         userService.sendQuestionnaire(UserDto.map(userDto(), "12312"));
         verify(emailSenderService, times(1)).sendEmail(any());
+    }
+
+    @Test
+    void testGetAllUsers() {
+        when(userRepo.findAll()).thenReturn(List.of(student()));
+        List<UserDto> result = userService.getAllUsers();
+        assertEquals(List.of(map(student())), result);
+        verify(userRepo).findAll();
+
     }
 
     private UserDto userDto() {

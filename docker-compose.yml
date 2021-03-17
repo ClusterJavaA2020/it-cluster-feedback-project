@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   feedback-server:
-    image: javatrap/it-cluster-feedback-backend
+    image: javatrap/it-cluster-feedback-backend:latest
     container_name: "it-cluster-feedback-backend"
     ports:
       - "8080:8080"
@@ -28,7 +28,7 @@ services:
 
 
   feedback-client:
-    image: javatrap/it-cluster-feedback-frontend
+    image: javatrap/it-cluster-feedback-frontend:latest
     container_name: "it-cluster-feedback-frontend"
     ports:
       - "4200:4200"
